@@ -1,0 +1,38 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Next.js build output
+/.next/
+/out/
+
+# Production build
+/build
+dist
+
+# Reference artifacts (isolated from version control)
+_reference/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+# Debug and temporary logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS and IDE files
+.DS_Store
+*.pem
+.idea/
+.vscode/
+*.tsbuildinfo
+next-env.d.ts

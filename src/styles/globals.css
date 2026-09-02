@@ -1,0 +1,138 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+ * STUDIO AM — DESIGN SYSTEM V2.5 TOKENS
+ */
+
+:root {
+  /* Color Tokens — Paleta Monocromática Oficial */
+  --color-black:      #0b0b0b;
+  --color-graphite:   #2b2b2a;
+  --color-gray:       #70706d;
+  --color-light-gray: #d9d8d4;
+  --color-beige:      #f2efe9;
+  --color-warm-white: #fbfaf7;
+  --color-white:      #ffffff;
+
+  /* Semantic aliases (mantidos para compatibilidade com componentes existentes) */
+  --color-background: var(--color-beige);
+  --color-surface:    var(--color-warm-white);
+  --color-foreground: var(--color-black);
+  --color-muted:      var(--color-gray);
+  --color-border:     var(--color-light-gray);
+  --color-dark:       var(--color-graphite);
+  --color-on-dark:    var(--color-warm-white);
+
+  /* Typography Font Families */
+  --font-display: var(--font-montserrat), "Montserrat", system-ui, sans-serif;
+  --font-sans:    var(--font-montserrat), "Montserrat", system-ui, sans-serif;
+
+  /* Section Vertical Spacing Token (Fluid) */
+  --section-py: clamp(4.5rem, 10vw, 10rem);
+
+  /* Container Max Width Tokens */
+  --container-narrow:  760px;
+  --container-content: 1280px;
+  --container-wide:    1440px;
+
+  /* Motion Tokens */
+  --transition-fast:   180ms ease-out;
+  --transition-normal: 280ms ease-out;
+  --transition-slow:   480ms ease-out;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Focus ring accessibility styling */
+  *:focus-visible {
+    outline: 1px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+}
+
+/* Fluid Typographic Utilities */
+.text-display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(3.75rem, 7vw, 7.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.text-display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5.5vw, 6rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.text-heading-1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 4.5vw, 4.75rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 3.5vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.text-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
