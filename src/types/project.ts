@@ -20,3 +20,36 @@ export interface Project {
   cover: string;
   gallery: string[];
 }
+
+export type ProjectStatus = 'draft' | 'published';
+
+export interface DbProject {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  description: string | null;
+  category: string;
+  location: string | null;
+  year: number | null;
+  area: string | null;
+  status: ProjectStatus;
+  featured: boolean;
+  display_order: number;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbProjectImage {
+  id: string;
+  project_id: string;
+  storage_path: string;
+  alt: string;
+  caption: string | null;
+  display_order: number;
+  is_cover: boolean;
+  created_at: string;
+  updated_at: string;
+}
+

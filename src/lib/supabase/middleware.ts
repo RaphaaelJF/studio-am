@@ -34,8 +34,9 @@ export async function updateSession(request: NextRequest) {
 
   const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login')
   const isAdminPage = request.nextUrl.pathname.startsWith('/admin')
+  const isDemoVisual = request.nextUrl.searchParams.get('visual') === 'demo' && process.env.NODE_ENV === 'development'
 
-  if (isAdminPage && !isLoginPage && !user) {
+  if (isAdminPage && !isLoginPage && !user && !isDemoVisual) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
     return NextResponse.redirect(url)
