@@ -64,13 +64,16 @@ export function AdminWorkflowFooter() {
           <div className="admin-draft-line">✦ ············· Rascunho (pode editar quando quiser) ············· ↑</div>
         </DesktopFooterSection>
 
-        <DesktopFooterSection title="O que Anne pode editar" className="admin-permission-card">
-          <ul>{allowed.map(item => <li className="allowed" key={item}>{item}</li>)}</ul>
+        <section className="admin-dark-card admin-permission-card">
+          <div>
+            <h2 className="mb-3.5">O que Anne pode editar</h2>
+            <ul>{allowed.map(item => <li className="allowed" key={item}>{item}</li>)}</ul>
+          </div>
           <div className="admin-permission-protected">
             <h2>O que Anne não pode editar</h2>
             <ul>{protectedItems.map(item => <li key={item}>{item}</li>)}</ul>
           </div>
-        </DesktopFooterSection>
+        </section>
 
         <DesktopFooterSection title="Tecnologias sugeridas" className="admin-tech-card">
           <div className="admin-tech-grid">
@@ -167,13 +170,16 @@ export function AdminWorkflowFooter() {
           <div className="admin-draft-line">✦ ············· Rascunho (pode editar quando quiser) ············· ↑</div>
         </DesktopFooterSection>
 
-        <DesktopFooterSection title="O que Anne pode editar" className="admin-permission-card">
-          <ul>{allowed.map(item => <li className="allowed" key={item}>{item}</li>)}</ul>
+        <section className="admin-dark-card admin-permission-card">
+          <div>
+            <h2 className="mb-3.5">O que Anne pode editar</h2>
+            <ul>{allowed.map(item => <li className="allowed" key={item}>{item}</li>)}</ul>
+          </div>
           <div className="admin-permission-protected">
             <h2>O que Anne não pode editar</h2>
             <ul>{protectedItems.map(item => <li key={item}>{item}</li>)}</ul>
           </div>
-        </DesktopFooterSection>
+        </section>
 
         <DesktopFooterSection title="Tecnologias sugeridas" className="admin-tech-card">
           <div className="admin-tech-grid">
