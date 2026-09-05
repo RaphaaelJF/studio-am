@@ -367,6 +367,7 @@
 }
 
 @media (min-width: 1024px) {
+
   .admin-mobile-header,
   .admin-mobile-menu-button,
   .admin-mobile-drawer-trigger {
@@ -643,19 +644,42 @@
 }
 
 .admin-workflow-steps {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 }
 
+.admin-workflow-steps::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 12px;
+  background: radial-gradient(80px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 255, 255, 0.04), transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.admin-workflow-steps:hover::before {
+  opacity: 1;
+}
+
 .admin-workflow-steps>i {
+  position: relative;
+  z-index: 1;
   margin-top: 19px;
   color: #d0d0ce;
   font-size: 17px;
   font-style: normal;
+  opacity: 0.45;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
 .admin-workflow-step {
+  position: relative;
+  z-index: 1;
   min-width: 48px;
   text-align: center;
 }
@@ -671,19 +695,116 @@
   border-radius: 50%;
   font-size: 19px;
   line-height: 1;
-}
-
-.admin-workflow-step.is-publish>span {
-  color: #fff;
-  background: #42a969;
-  border-color: #55be79;
-  box-shadow: 0 0 15px rgba(52, 183, 103, .35);
+  transform: translateZ(0);
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .admin-workflow-step small {
   color: #e4e4e1;
   font-size: 11px;
   line-height: 1.4;
+  display: block;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+/* Default active step (first) when no step is hovered */
+.admin-workflow-steps:not(:has(.admin-workflow-step:hover)) .admin-workflow-step:first-child>span {
+  color: #fff;
+  background: #42a969;
+  border-color: #55be79;
+  box-shadow: 0 0 15px rgba(52, 183, 103, .35);
+}
+
+.admin-workflow-steps:not(:has(.admin-workflow-step:hover)) .admin-workflow-step:first-child small {
+  opacity: 1;
+  color: #fff;
+}
+
+@keyframes admin-publish-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 15px rgba(52, 183, 103, 0.35), 0 0 0 0 rgba(255, 213, 74, 0.6); }
+  50% { transform: scale(1.10); box-shadow: 0 0 25px rgba(85, 222, 128, 0.7), 0 0 0 8px rgba(255, 213, 74, 0); }
+  100% { transform: scale(1.05); box-shadow: 0 0 22px rgba(85, 222, 128, 0.65); }
+}
+
+@keyframes admin-burst-anim {
+  0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  12% { opacity: 1; }
+  65% { opacity: 1; transform: scale(1) rotate(15deg); }
+  100% { opacity: 0; transform: scale(1.12) rotate(25deg); }
+}
+
+.admin-workflow-step.is-publish > span {
+  position: relative;
+  overflow: visible;
+}
+
+.admin-publish-icon {
+  position: relative;
+  z-index: 11;
+}
+
+.admin-publish-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 105px;
+  height: 105px;
+  margin-top: -52.5px;
+  margin-left: -52.5px;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  transform: scale(0.3) rotate(0deg);
+  z-index: 10;
+}
+
+.admin-publish-burst .admin-publish-burst__ray {
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-workflow-step:hover>span {
+    transform: scale(1.05);
+    background: #42a969;
+    border-color: #55be79;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(52, 183, 103, .35);
+  }
+
+  .admin-workflow-step.is-publish:hover > span {
+    border-color: #79dda0;
+    background: #47bc75;
+    color: #fff;
+    animation: admin-publish-pulse 0.9s ease-out forwards;
+  }
+
+  .admin-workflow-step.is-publish:hover .admin-publish-burst {
+    animation: admin-burst-anim 0.95s ease-out forwards;
+  }
+
+  .admin-workflow-step:hover small {
+    opacity: 1;
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-workflow-steps::before {
+    display: none !important;
+  }
+
+  .admin-workflow-step.is-publish:hover .admin-publish-burst {
+    display: none !important;
+    animation: none !important;
+  }
+
+  .admin-workflow-step>span,
+  .admin-workflow-step small,
+  .admin-workflow-steps>i {
+    transition: none !important;
+  }
 }
 
 .admin-draft-line {
