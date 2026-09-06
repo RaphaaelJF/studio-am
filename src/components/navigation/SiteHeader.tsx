@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { mainNavItems } from '@/data/navigation';
 import { DesktopNavigation } from '@/components/navigation/DesktopNavigation';
 import { MenuIcon, XIcon } from '@/components/shared/Icons';
@@ -11,16 +12,16 @@ export function SiteHeader() {
 
   return (
     <header className="bg-warm-white text-black border-b border-black/5 z-50 sticky top-0 px-6 md:px-12 py-4 md:py-5 flex justify-between items-center">
-      {/* Typographic Logo */}
-      <Link href="/" className="flex items-center space-x-2 focus-visible:outline-black">
-        <div className="border-l border-black/20 pl-4 py-0.5 flex flex-col justify-center">
-          <span className="font-semibold tracking-[0.22em] text-base md:text-lg uppercase leading-none text-black">
-            Studio AM
-          </span>
-          <span className="text-[8.5px] md:text-[9.5px] tracking-[0.25em] font-light uppercase text-black/70 mt-2 leading-none">
-            Arquitetura + Engenharia
-          </span>
-        </div>
+      {/* Official Brand Logo */}
+      <Link href="/" className="flex items-center focus-visible:outline-black focus-visible:outline-offset-4 rounded-sm">
+        <Image
+          src="/brand/studio-am-logo.png"
+          alt="Studio AM — Arquitetura e Engenharia"
+          width={2048}
+          height={1054}
+          priority
+          className="h-14 md:h-16 w-auto object-contain brightness-0"
+        />
       </Link>
 
       {/* Desktop Navigation */}

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function SiteFooter() {
   return (
@@ -7,9 +8,16 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
         {/* Marca & Identidade */}
         <div className="flex flex-col items-start border-l border-black/20 pl-4">
-          <span className="text-sm font-semibold tracking-[0.2em] mb-1.5 uppercase">Studio AM</span>
-          <span className="text-[10px] text-gray font-light uppercase tracking-[0.25em]">Arquitetura + Engenharia</span>
-          <p className="mt-5 text-[12px] text-graphite font-light max-w-[200px] leading-relaxed">
+          <Link href="/" className="focus-visible:outline-black focus-visible:outline-offset-4 rounded-sm mb-4">
+            <Image
+              src="/brand/studio-am-logo.png"
+              alt="Studio AM — Arquitetura e Engenharia"
+              width={2048}
+              height={1054}
+              className="h-12 w-auto object-contain brightness-0"
+            />
+          </Link>
+          <p className="text-[12px] text-graphite font-light max-w-[200px] leading-relaxed">
             O espaço e a técnica fazem parte da mesma decisão.
           </p>
         </div>
