@@ -13,10 +13,13 @@ import { ArrowLeftIcon } from '@/components/shared/Icons'
 import { PROJECT_CATEGORIES, slugify, validateProjectForm } from '@/types/admin-project-form'
 import type { ProjectFormData } from '@/types/admin-project-form'
 
+import { createProjectDraft, updateProjectDraft } from '@/app/admin/actions/projects'
+
 interface ProjectFormProps {
   mode: 'new' | 'edit'
   backUrl: string
   isDemo?: boolean
+  projectId?: string
 }
 
 type Step = 1 | 2 | 3 | 4
@@ -28,7 +31,7 @@ const STEPS = [
   { id: 4, label: 'Publicação' },
 ]
 
-export function ProjectForm({ mode, backUrl, isDemo }: ProjectFormProps) {
+export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormProps) {
   const { formData, setFormData, images, hasUnsavedChanges, setHasUnsavedChanges } = useProjectDraft()
   const { toast } = useToast()
   const router = useRouter()
@@ -73,17 +76,67 @@ export function ProjectForm({ mode, backUrl, isDemo }: ProjectFormProps) {
   }
 
   const handleSave = async () => {
+    if (isSaving) return
+
     const validation = validateProjectForm(formData, images, false)
     if (!validation.valid) {
       setErrors(validation.errors as Record<string, string>)
       toast('Corrija os campos obrigatórios.', 'error')
       return
     }
+
     setIsSaving(true)
-    await new Promise(r => setTimeout(r, 700))
-    setIsSaving(false)
-    setHasUnsavedChanges(false)
-    toast('Rascunho salvo nesta sessão. Nenhum dado foi persistido.', 'info')
+
+    // Modo demonstrativo permanece puramente local/simulado
+    if (isDemo) {
+      await new Promise(r => setTimeout(r, 600))
+      setIsSaving(false)
+      setHasUnsavedChanges(false)
+      toast('Rascunho salvo no modo visual. Nenhum dado foi persistido.', 'info')
+      return
+    }
+
+    try {
+      if (mode === 'new') {
+        const res = await createProjectDraft(formData)
+        if (!res.success) {
+          if (res.fieldErrors) {
+            setErrors(prev => ({ ...prev, ...res.fieldErrors }))
+          }
+          toast(res.error, 'error')
+          setIsSaving(false)
+          return
+        }
+
+        setHasUnsavedChanges(false)
+        toast('Rascunho criado com sucesso.', 'success')
+        router.push(`/admin/projetos/${res.data.id}/editar`)
+        return
+      }
+
+      if (!projectId) {
+        toast('Identificador do projeto não encontrado para edição.', 'error')
+        setIsSaving(false)
+        return
+      }
+
+      const res = await updateProjectDraft(projectId, formData)
+      if (!res.success) {
+        if (res.fieldErrors) {
+          setErrors(prev => ({ ...prev, ...res.fieldErrors }))
+        }
+        toast(res.error, 'error')
+        setIsSaving(false)
+        return
+      }
+
+      setHasUnsavedChanges(false)
+      toast('Rascunho atualizado com sucesso.', 'success')
+    } catch {
+      toast('Ocorreu um erro ao salvar o rascunho.', 'error')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handlePublish = async () => {

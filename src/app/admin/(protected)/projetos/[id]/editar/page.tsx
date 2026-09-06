@@ -42,7 +42,7 @@ export default async function EditProjectPage({ params, searchParams }: PageProp
     return (
       <ProjectDraftProvider draftKey={id} initialFormData={demo.formData} initialImages={demo.images}>
         {backLink}
-        <ProjectForm mode="edit" backUrl={backUrl} isDemo={isDemo} />
+        <ProjectForm mode="edit" backUrl={backUrl} isDemo={isDemo} projectId={id} />
       </ProjectDraftProvider>
     )
   }
@@ -85,7 +85,7 @@ export default async function EditProjectPage({ params, searchParams }: PageProp
   return (
     <ProjectDraftProvider draftKey={id} initialFormData={initialFormData}>
       {backLink}
-      <ProjectForm mode="edit" backUrl={backUrl} isDemo={isDemo} />
+      <ProjectForm mode="edit" backUrl={backUrl} isDemo={isDemo} projectId={id} />
     </ProjectDraftProvider>
   )
 }
