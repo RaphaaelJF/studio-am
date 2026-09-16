@@ -5,59 +5,108 @@ import { MoveRightIcon } from '@/components/shared/Icons';
 
 export function HeroSection() {
   return (
-    <section className="pt-24 md:pt-32 pb-16 md:pb-24 px-6 md:px-12 bg-warm-white w-full overflow-hidden">
-      <div className="max-w-[1400px] mx-auto w-full">
-        <div className="mb-12 md:mb-16">
+    <section className="bg-warm-white w-full overflow-hidden">
+      {/* ── LAYOUT ──────────────────────────────────────────────────
+          Mobile / Tablet (< 1024px): stacked — text then image
+          Desktop (≥ 1024px):         two columns — text 42% | image 58%
+      ─────────────────────────────────────────────────────────────── */}
+      <div className="lg:flex lg:min-h-[680px]">
+
+        {/* ── LEFT COLUMN: Text content ─── */}
+        <div className="w-full lg:w-[42%] flex-shrink-0 flex justify-end">
+          <div className="
+            flex flex-col justify-center
+            w-full max-w-[672px]
+            px-5 md:px-8 xl:px-12
+            pt-8 pb-10 sm:pt-10 sm:pb-12 lg:pt-24 lg:pb-16
+          ">
+          {/* Eyebrow / Overline */}
+          <div className="flex items-center gap-3 md:gap-4 mb-6">
+            <div className="w-8 md:w-10 h-[1px] bg-neutral-900/40"></div>
+            <p className="text-xs leading-[1.5] font-semibold tracking-widest uppercase text-neutral-500">
+              Studio AM · Arquitetura e Engenharia
+            </p>
+          </div>
+
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-medium leading-[1.05] tracking-tight text-black md:ml-4 lg:ml-8 mb-8 md:mb-12">
-            Arquitetura que conecta.<br />
-            <span className="font-light italic text-graphite">Engenharia que sustenta.</span>
+          <h1 className="
+            text-[36px] md:text-5xl lg:text-6xl xl:text-[64px]
+            leading-[1.05] tracking-tight mb-7 md:mb-8
+          ">
+            <span className="block font-bold text-neutral-900">
+              Arquitetura<br />
+              que conecta.
+            </span>
+            <span className="block font-light text-neutral-700 mt-1">
+              Engenharia<br />
+              que sustenta.
+            </span>
           </h1>
 
-          {/* Support Text & CTAs */}
-          <div className="md:ml-24 lg:ml-40 max-w-lg">
-            <p className="text-graphite text-base md:text-lg font-light leading-relaxed mb-10">
-              Projetos residenciais e comerciais personalizados, funcionais e tecnicamente viáveis — pensados para a vida real e para cada etapa da construção.
-            </p>
+          {/* Supporting text */}
+          <p className="text-neutral-700 text-base md:text-[18px] font-normal leading-relaxed mb-7 md:mb-8 max-w-[40ch]">
+            Projetamos casas e espaços comerciais para a sua rotina, unindo arquitetura e engenharia para transformar suas ideias em espaços que você possa construir e viver.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start">
-              <Link
-                href="#contato"
-                className="inline-flex items-center justify-center bg-black text-white px-8 py-4 min-h-[48px] font-semibold uppercase tracking-widest text-[11px] hover:bg-graphite transition-colors"
-              >
-                Falar sobre meu projeto
-                <MoveRightIcon className="ml-3 w-3 h-3" />
-              </Link>
-              <Link
-                href="#projetos"
-                className="inline-flex items-center justify-center bg-transparent border border-black/20 text-black px-8 py-4 min-h-[48px] font-semibold uppercase tracking-widest text-[11px] hover:border-black hover:bg-black/5 transition-colors"
-              >
-                Conhecer projetos
-              </Link>
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <Link
+              href="#contato"
+              className="inline-flex items-center justify-center bg-[#171717] text-white px-8 py-4 min-h-[48px] font-semibold uppercase tracking-wider text-xs hover:bg-[#2b2b2a] transition-colors"
+            >
+              Iniciar um projeto
+              <MoveRightIcon className="ml-3 w-3 h-3" />
+            </Link>
+            <Link
+              href="#projetos"
+              className="inline-flex items-center justify-center bg-transparent border border-[#171717]/30 text-[#171717] px-8 py-4 min-h-[48px] font-semibold uppercase tracking-wider text-xs hover:border-[#171717] hover:bg-black/5 transition-colors"
+            >
+              Ver projetos
+            </Link>
+          </div>
+
+          {/* Editorial anchors — desktop only */}
+          <div className="hidden lg:flex items-stretch gap-4 mt-8 lg:mt-10 text-[10px] leading-[1.6] font-semibold tracking-[0.3em] uppercase text-black/40">
+            <div className="w-[1px] bg-black/20"></div>
+            <div className="flex flex-col justify-between py-0.5 gap-2">
+              <span>Espaços</span>
+              <span>Pessoas</span>
+              <span>Propósito</span>
             </div>
           </div>
         </div>
+        </div>
 
-        {/* Photography */}
-        <div className="relative w-full aspect-[4/3] md:aspect-[21/9] bg-light-gray overflow-hidden md:w-[95%] ml-auto border border-black/5 p-1 md:p-2">
-          <div className="w-full h-full relative overflow-hidden">
-            <Image
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2574&auto=format&fit=crop"
-              alt="Arquitetura de uma casa moderna"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1400px) 95vw, 1400px"
-              className="object-cover"
-              unoptimized
-            />
-            {/* Imagem temporária indicação editorial */}
-            <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-warm-white/90 px-3 py-1.5 border border-black/10 z-10">
-              <span className="text-[9px] font-medium tracking-[0.2em] uppercase text-black/80">
-                Imagem conceitual temporária
-              </span>
-            </div>
+        {/* ── RIGHT COLUMN: Photography ─── */}
+        <div className="
+          relative
+          w-full aspect-[4/3]
+          lg:aspect-auto lg:flex-1
+        ">
+          {/* Desktop Gradient Overlay to blend image with warm-white background (limited and subtle) */}
+          <div className="hidden lg:block absolute inset-y-0 left-0 w-24 xl:w-32 bg-gradient-to-r from-warm-white to-transparent z-10 pointer-events-none"></div>
+
+          <Image
+            src="/images/projects/cabana-maria-celia/hero.webp"
+            alt="Visualização arquitetônica da Cabana Maria Célia"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 58vw"
+            className="object-cover object-center"
+          />
+
+          {/* Editorial label — bottom right */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-4 right-4 lg:bottom-10 lg:right-10 z-20 flex items-center gap-3"
+          >
+            <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-white drop-shadow-md">
+              Do conceito à realidade
+            </span>
+            <div className="w-[1px] h-6 bg-white/40 hidden md:block"></div>
           </div>
         </div>
+
       </div>
     </section>
   );

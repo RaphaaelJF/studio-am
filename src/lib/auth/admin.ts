@@ -18,14 +18,6 @@ export async function requireAdminProfile(): Promise<AdminProfile> {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    if (process.env.NODE_ENV === 'development') {
-      return {
-        id: 'demo-anne',
-        display_name: 'Anne Martins',
-        role: 'editor',
-        active: true,
-      }
-    }
     redirect('/admin/login')
   }
 

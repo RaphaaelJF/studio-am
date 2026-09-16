@@ -4,80 +4,80 @@ import Image from 'next/image';
 export function FeaturedProjectSection() {
   return (
     <section className="py-20 md:py-32 px-6 md:px-12 bg-beige border-t border-light-gray">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="mb-12 md:mb-16 text-center">
-          <p className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-3">Caso de Estudo</p>
-          <h2 className="text-3xl md:text-4xl font-medium text-black">Casa Andreia e Marco</h2>
+      <div className="max-w-[1280px] mx-auto">
+        {/* Cabeçalho da seção */}
+        <div className="mb-12 md:mb-16 text-left">
+          <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-3">
+            Caso de Estudo
+          </p>
+          <h2 className="text-3xl md:text-5xl font-medium text-neutral-900 tracking-tight">
+            Casa Andreia e Marco
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-          {/* Coluna Visual */}
-          <div className="lg:col-span-7">
-            <div className="relative aspect-[4/3] bg-light-gray mb-6 p-2 border border-light-gray">
-              <div className="w-full h-full relative overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2070&auto=format&fit=crop"
-                  alt="Imagem conceitual temporária para composição visual do projeto Casa Andreia e Marco"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px"
-                  className="object-cover"
-                  unoptimized
-                />
-                <div className="absolute bottom-3 right-3 px-2 py-1 border border-white/20 bg-black/40 backdrop-blur-md z-10">
-                  <span className="text-[9px] font-light tracking-[0.2em] uppercase text-white/90">
-                    Imagem conceitual temporária
-                  </span>
-                </div>
-              </div>
+        {/* Grade em 2 colunas: Imagem (~55%) e Narrativa (~45%) com gap de 40px */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* Coluna Esquerda: Ilustração Conceitual (~55%) */}
+          <figure className="lg:col-span-7 flex flex-col m-0">
+            <div className="w-full bg-transparent overflow-hidden">
+              <Image
+                src="/images/concepts/aproveitamento-desnivel.png"
+                alt="Ilustração em corte de uma residência em terreno inclinado, com aproveitamento do pavimento inferior."
+                width={1024}
+                height={768}
+                sizes="(max-width: 1024px) 100vw, 55vw"
+                className="w-full h-auto object-contain"
+              />
             </div>
-            <div className="flex justify-between items-center text-[11px] font-semibold tracking-widest uppercase text-gray border-b border-light-gray pb-3">
-              <span>Visão: Arquitetura Integrada</span>
-              <span>Serra Gaúcha</span>
-            </div>
-          </div>
+            <figcaption className="mt-4 text-sm text-neutral-600 font-normal leading-relaxed">
+              Ilustração conceitual do aproveitamento do desnível. Não representa o projeto original.
+            </figcaption>
+          </figure>
 
-          {/* Coluna Narrativa */}
-          <div className="lg:col-span-5 flex flex-col justify-center">
-            <div className="border-l border-black/10 pl-6 md:pl-10">
-              <h3 className="text-xl md:text-2xl font-medium mb-8 text-black leading-snug">
-                Transformando um custo estrutural em oportunidade arquitetônica.
-              </h3>
+          {/* Coluna Direita: Narrativa Técnica (~45%) */}
+          <div className="lg:col-span-5 flex flex-col justify-start border-l-2 border-black/15 pl-6 md:pl-8 py-1">
+            <h3 className="text-2xl md:text-[28px] font-medium mb-8 text-neutral-900 leading-snug">
+              Transformando um custo estrutural em oportunidade arquitetônica.
+            </h3>
 
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-1.5 flex items-center gap-2">
-                    <span className="w-3 h-px bg-gray"></span> O Contexto
-                  </h4>
-                  <p className="text-sm text-graphite font-light leading-relaxed pl-5">
-                    Residência em terreno com acentuada declividade. O projeto pedia aproveitamento inteligente das condições naturais.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-1.5 flex items-center gap-2">
-                    <span className="w-3 h-px bg-gray"></span> O Desafio
-                  </h4>
-                  <p className="text-sm text-graphite font-light leading-relaxed pl-5">
-                    As fundações e estruturas necessárias para nivelar uma residência de um pavimento teriam custo próximo ao cenário com aproveitamento do desnível.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-1.5 flex items-center gap-2">
-                    <span className="w-3 h-px bg-gray"></span> A Decisão
-                  </h4>
-                  <p className="text-sm text-graphite font-light leading-relaxed pl-5">
-                    Avaliar a criação de um subsolo, aproveitando o investimento estrutural mandatório e convertendo-o em espaço habitável.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-10 bg-warm-white p-6 border border-light-gray shadow-sm">
-                <h4 className="text-[11px] font-semibold tracking-widest uppercase text-black mb-2">O Resultado</h4>
-                <p className="text-sm md:text-base font-medium text-black leading-relaxed">
-                  O aproveitamento do desnível transformou uma condicionante do terreno em uma oportunidade para ampliar o uso da residência e integrar melhor arquitetura, estrutura e implantação.
+            {/* Contexto, Desafio e Decisão dispostos verticalmente */}
+            <div className="space-y-6 mb-8">
+              <div>
+                <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
+                  <span className="w-3 h-px bg-neutral-500"></span> O Contexto
+                </h4>
+                <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
+                  Residência em terreno com acentuada declividade. O projeto pedia aproveitamento inteligente das condições naturais.
                 </p>
               </div>
+
+              <div>
+                <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
+                  <span className="w-3 h-px bg-neutral-500"></span> O Desafio
+                </h4>
+                <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
+                  As fundações e estruturas necessárias para nivelar uma residência de um pavimento teriam custo próximo ao cenário com aproveitamento do desnível.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
+                  <span className="w-3 h-px bg-neutral-500"></span> A Decisão
+                </h4>
+                <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
+                  Avaliar a criação de um subsolo, aproveitando o investimento estrutural mandatório e convertendo-o em espaço habitável.
+                </p>
+              </div>
+            </div>
+
+            {/* O Resultado */}
+            <div className="bg-warm-white p-6 md:p-8 border border-light-gray shadow-sm">
+              <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-900 mb-2">
+                O Resultado
+              </h4>
+              <p className="text-base md:text-[17px] font-medium text-neutral-900 leading-relaxed">
+                O aproveitamento do desnível transformou uma condicionante do terreno em uma oportunidade para ampliar o uso da residência e integrar melhor arquitetura, estrutura e implantação.
+              </p>
             </div>
           </div>
         </div>

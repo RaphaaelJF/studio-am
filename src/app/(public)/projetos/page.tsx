@@ -1,7 +1,93 @@
-export default function ProjectsPage() {
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import type { Metadata } from 'next';
+import { getPublishedProjects } from '@/lib/projects-public';
+import { ArrowUpRightIcon } from '@/components/shared/Icons';
+
+export const metadata: Metadata = {
+  title: 'Portfólio de Projetos | Studio AM',
+  description: 'Conheça os projetos e visualizações arquitetônicas desenvolvidos pelo Studio AM — Arquitetura + Engenharia.',
+};
+
+// Revalida o portfólio a cada 60s para refletir publicações sem rebuild.
+export const revalidate = 60
+
+export default async function ProjectsPage() {
+  const projects = await getPublishedProjects();
+
   return (
-    <main>
-      <h1>Projetos</h1>
-    </main>
+    <div className="bg-warm-white min-h-screen py-16 md:py-24 px-6 md:px-12">
+      <div className="max-w-[1400px] mx-auto">
+        {/* Cabeçalho Editorial */}
+        <header className="border-b border-light-gray pb-10 mb-16 md:mb-20">
+          <p className="text-xs font-semibold tracking-widest uppercase text-[#595959] mb-3">
+            Portfólio Selecionado
+          </p>
+          <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-[#171717]">
+            Projetos.
+          </h1>
+        </header>
+
+        {/* Grade de Projetos */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12 lg:gap-x-16">
+          {projects.map((project, index) => {
+            // Composição variada preservando acabamento editorial
+            const isFirst = index === 0;
+
+            return (
+              <article
+                key={project.slug}
+                className={`col-span-1 ${
+                  isFirst
+                    ? 'md:col-span-12'
+                    : 'md:col-span-6'
+                }`}
+              >
+                <Link
+                  href={`/projetos/${project.slug}`}
+                  className="group block"
+                >
+                  <div
+                    className={`relative overflow-hidden mb-6 bg-light-gray ${
+                      isFirst
+                        ? 'aspect-[16/9] md:aspect-[21/9]'
+                        : 'aspect-[16/10]'
+                    }`}
+                  >
+                    <Image
+                      src={project.cover.src}
+                      alt={project.cover.alt}
+                      fill
+                      sizes={
+                        isFirst
+                          ? '(max-width: 768px) 100vw, (max-width: 1400px) 100vw, 1400px'
+                          : '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 700px'
+                      }
+                      className="object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                      priority={isFirst}
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-medium text-[#171717] mb-1.5 group-hover:text-[#404040] transition-colors">
+                        {project.title}
+                      </h2>
+                      <p className="text-sm font-normal text-[#595959]">
+                        {project.category}
+                      </p>
+                    </div>
+                    <div className="flex items-center text-xs font-semibold tracking-wider uppercase text-[#171717] group-hover:text-[#404040] transition-colors">
+                      Ver projeto <ArrowUpRightIcon className="ml-2 w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

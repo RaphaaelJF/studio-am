@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { requireAdminProfile } from '@/lib/auth/admin'
 import { getAdminProjects } from '@/lib/admin/projects'
 import { AdminDemoBanner, AdminCard } from './_components/AdminSharedUI'
@@ -67,6 +68,16 @@ export default async function AdminDashboardPage(props: {
     { text: 'Projeto Clínica Harmonia publicado', time: 'Há 3 dias' },
   ]
 
+  // Em modo real, a atividade deriva dos projetos do banco — nada fictício.
+  const realActivity = [...projects]
+    .sort((a, b) => +new Date(b.updated_at) - +new Date(a.updated_at))
+    .slice(0, 4)
+    .map((p) => ({
+      text: `${p.title} — ${p.status === 'published' ? 'publicado' : 'atualizado como rascunho'}`,
+      time: formatDate(p.updated_at),
+    }))
+  const feed = isDemo ? activity : realActivity
+
   const demoEdit = demoProjectsFull['demo-andreia-marco']
 
   return (
@@ -132,7 +143,7 @@ export default async function AdminDashboardPage(props: {
                         <li key={p.id} style={{ borderBottom: i < recentProjects.length - 1 ? '1px solid var(--admin-border)' : 'none' }}>
                           <Link href={editHref} className="flex items-center gap-3 px-5 py-3 transition-colors" style={{ color: 'inherit' }}>
                             <div className="shrink-0 rounded overflow-hidden" style={{ width: 56, height: 40, background: 'var(--admin-active)', border: '1px solid var(--admin-border)' }}>
-                              {thumb && <img src={thumb} alt={p.title} className="w-full h-full object-cover" />}
+                              {thumb && <Image src={thumb} alt={p.title} width={56} height={40} className="w-full h-full object-cover" />}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate" style={{ color: 'var(--admin-text)' }}>{p.title}</p>
@@ -153,15 +164,21 @@ export default async function AdminDashboardPage(props: {
                   <h2 className="text-sm font-semibold" style={{ color: 'var(--admin-text)' }}>Atividade recente</h2>
                 </div>
                 <ul className="px-5 py-2">
-                  {(isDemo ? activity : projects.length === 0 ? [] : activity).map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 py-3" style={{ borderBottom: i < activity.length - 1 ? '1px solid var(--admin-border)' : 'none' }}>
+                  {feed.length === 0 ? (
+                    <li className="py-6 text-center">
+                      <p className="text-sm" style={{ color: 'var(--admin-muted)' }}>Nenhuma atividade ainda. Crie seu primeiro projeto.</p>
+                    </li>
+                  ) : (
+                    feed.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 py-3" style={{ borderBottom: i < feed.length - 1 ? '1px solid var(--admin-border)' : 'none' }}>
                       <div className="mt-1.5 shrink-0 rounded-full" style={{ width: 6, height: 6, background: 'var(--admin-muted)' }} />
                       <div>
                         <p className="text-sm" style={{ color: 'var(--admin-text)' }}>{item.text}</p>
                         <p className="text-xs mt-0.5" style={{ color: 'var(--admin-muted)' }}>{item.time}</p>
                       </div>
                     </li>
-                  ))}
+                    ))
+                  )}
                 </ul>
               </AdminCard>
             </div>

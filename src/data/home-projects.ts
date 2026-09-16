@@ -1,53 +1,148 @@
-export type ProjectImageAspect = "16/10" | "3/2" | "4/5";
-
-export interface ProjectImage {
-  aspect: ProjectImageAspect;
+export interface ProjectImageItem {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  type: 'visualizacao-arquitetonica';
 }
 
-export interface ProjectData {
-  id: string;
+export interface PortfolioProject {
+  slug: string;
   title: string;
   category: string;
-  label: string; // e.g., "01 / 03"
-  image: ProjectImage;
+  cover: ProjectImageItem;
+  gallery: ProjectImageItem[];
 }
 
-export interface FeaturedProjectData extends ProjectData {
-  technical: {
-    typology: string;
-    location: string;
-    area: string;
-    year: string;
-  };
-}
-
-export const selectedProjects: ProjectData[] = [
+export const portfolioProjects: PortfolioProject[] = [
   {
-    id: "01",
-    title: "Projeto 01",
-    category: "Residencial",
-    label: "01 / 03",
-    image: { aspect: "16/10" },
+    slug: 'cabana-maria-celia',
+    title: 'Cabana Maria Célia',
+    category: 'Residencial',
+    cover: {
+      src: '/images/projects/cabana-maria-celia/hero.webp',
+      alt: 'Visualização arquitetônica da fachada e volumetria da Cabana Maria Célia',
+      width: 1672,
+      height: 941,
+      type: 'visualizacao-arquitetonica',
+    },
+    gallery: [
+      {
+        src: '/images/projects/cabana-maria-celia/hero.webp',
+        alt: 'Visualização arquitetônica da fachada principal e volumetria em madeira da Cabana Maria Célia',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/cabana-maria-celia/cabana-01.webp',
+        alt: 'Visualização arquitetônica da vista em perspectiva da Cabana Maria Célia',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/cabana-maria-celia/cabana-03.webp',
+        alt: 'Visualização arquitetônica dos detalhes de madeira e cobertura da Cabana Maria Célia',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/cabana-maria-celia/cabana-04.webp',
+        alt: 'Visualização arquitetônica posterior e integração ao terreno da Cabana Maria Célia',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+    ],
   },
   {
-    id: "02",
-    title: "Projeto 02",
-    category: "Interiores",
-    label: "02 / 03",
-    image: { aspect: "4/5" },
+    slug: 'residencia-debora-william',
+    title: 'Residência Débora e William',
+    category: 'Residencial',
+    cover: {
+      src: '/images/projects/residencia-debora-william/debora-william-02.webp',
+      alt: 'Visualização arquitetônica da fachada principal da Residência Débora e William',
+      width: 1280,
+      height: 720,
+      type: 'visualizacao-arquitetonica',
+    },
+    gallery: [
+      {
+        src: '/images/projects/residencia-debora-william/debora-william-01.webp',
+        alt: 'Visualização arquitetônica angular da fachada da Residência Débora e William',
+        width: 1280,
+        height: 720,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/residencia-debora-william/debora-william-02.webp',
+        alt: 'Visualização arquitetônica da fachada frontal e acessos da Residência Débora e William',
+        width: 1280,
+        height: 720,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/residencia-debora-william/debora-william-03.webp',
+        alt: 'Visualização arquitetônica lateral e garagem da Residência Débora e William',
+        width: 1280,
+        height: 720,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/residencia-debora-william/debora-william-04.webp',
+        alt: 'Visualização arquitetônica da área de lazer e fundos da Residência Débora e William',
+        width: 1280,
+        height: 720,
+        type: 'visualizacao-arquitetonica',
+      },
+    ],
+  },
+  {
+    slug: 'quiosque-familia-oliveira',
+    title: 'Quiosque Família Oliveira',
+    category: 'Lazer & Convivência',
+    cover: {
+      src: '/images/projects/quiosque-familia-oliveira/quiosque-04.webp',
+      alt: 'Visualização arquitetônica da fachada e varanda do Quiosque Família Oliveira',
+      width: 1672,
+      height: 941,
+      type: 'visualizacao-arquitetonica',
+    },
+    gallery: [
+      {
+        src: '/images/projects/quiosque-familia-oliveira/quiosque-02.webp',
+        alt: 'Visualização arquitetônica da área de churrasqueira e espaço gourmet do Quiosque Família Oliveira',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/quiosque-familia-oliveira/quiosque-04.webp',
+        alt: 'Visualização arquitetônica externa e integração com a natureza do Quiosque Família Oliveira',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/quiosque-familia-oliveira/quiosque-05.webp',
+        alt: 'Visualização arquitetônica da perspectiva angular do Quiosque Família Oliveira',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+      {
+        src: '/images/projects/quiosque-familia-oliveira/quiosque-06.webp',
+        alt: 'Visualização arquitetônica dos detalhes construtivos e esquadrias do Quiosque Família Oliveira',
+        width: 1672,
+        height: 941,
+        type: 'visualizacao-arquitetonica',
+      },
+    ],
   },
 ];
 
-export const featuredProject: FeaturedProjectData = {
-  id: "03",
-  title: "Projeto em Evidência",
-  category: "Residencial",
-  label: "PROJETO EM EVIDÊNCIA",
-  image: { aspect: "16/10" },
-  technical: {
-    typology: "Residencial",
-    location: "—",
-    area: "—",
-    year: "—",
-  },
-};
+export function getPortfolioProjectBySlug(slug: string): PortfolioProject | undefined {
+  return portfolioProjects.find((p) => p.slug === slug);
+}

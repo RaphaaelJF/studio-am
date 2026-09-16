@@ -54,7 +54,7 @@ export function PublicationPanel() {
         </div>
         {formData.status === 'published' && (
           <p className="mt-2 text-[10px] text-muted leading-relaxed">
-            Simular publicação — nenhum dado foi enviado ao banco.
+            Publicado — visível no site e no portfólio.
           </p>
         )}
       </div>

@@ -36,3 +36,13 @@ yarn-error.log*
 .vscode/
 *.tsbuildinfo
 next-env.d.ts
+
+# Temporary archives, extracts & scratch
+*.zip
+temp_extract/
+temp_project_assets/
+test-results/
+scratch/
+convert_image.js
+hero_src.png
+

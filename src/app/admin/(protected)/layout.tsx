@@ -27,9 +27,8 @@ export default async function AdminProtectedLayout({
             <Image
               src="/brand/studio-am-logo.png"
               alt="Studio AM — Arquitetura e Engenharia"
-              width={2048}
-              height={1054}
-              priority
+              width={340}
+              height={175}
               className="h-auto w-[170px] object-contain"
             />
           </Link>

@@ -1,11 +1,9 @@
-import type { Project } from '@/types/project';
+import type { PortfolioProject } from '@/data/home-projects';
+import { portfolioProjects, getPortfolioProjectBySlug } from '@/data/home-projects';
 
-/**
- * Projects data shell (Phase 0)
- * Content will be populated in subsequent phases.
- */
-export const projects: Project[] = [];
+export type { PortfolioProject };
+export { portfolioProjects, getPortfolioProjectBySlug };
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
-}
+// Alias export for any consumer expecting `projects`
+export const projects = portfolioProjects;
+export const getProjectBySlug = getPortfolioProjectBySlug;

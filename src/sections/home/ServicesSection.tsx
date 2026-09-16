@@ -1,148 +1,173 @@
 import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { MoveRightIcon } from '@/components/shared/Icons';
+
+/* ── Ícones dos Serviços (Traço uniforme ~1.75px, cor #c8baab) ── */
+
+/** 1. Projetos: Esquadro triangular com recorte triangular interno */
+function TriangularSquareIcon({ className = "w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {/* Triângulo externo */}
+      <path d="M4 20h16a1 1 0 0 0 .8-1.6L5.6 3.2A1 1 0 0 0 4 4v16z" />
+      {/* Recorte triangular interno */}
+      <path d="M7 17h6.5L7 8.5V17z" />
+      {/* Marcas/graduações de escala na base */}
+      <line x1="9" y1="17" x2="9" y2="19" />
+      <line x1="12" y1="17" x2="12" y2="19" />
+      <line x1="15" y1="17" x2="15" y2="19" />
+    </svg>
+  );
+}
+
+/** 2. Obras: Capacete de proteção */
+function HardHatIcon({ className = "w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v2z" />
+      <path d="M10 10V5a2 2 0 0 1 4 0v5" />
+      <path d="M4 14a8 8 0 0 1 16 0" />
+    </svg>
+  );
+}
+
+/** 3. Documentação e Regularização: Documento com check */
+function FileCheckIcon({ className = "w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <polyline points="14 2 14 8 20 8" />
+      <path d="m9 15 2 2 4-4" />
+    </svg>
+  );
+}
+
+/** 4. Consultoria e Serviços Técnicos: Documento com lupa */
+function FileSearchIcon({ className = "w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <polyline points="14 2 14 8 20 8" />
+      <circle cx="11.5" cy="14.5" r="2.5" />
+      <path d="m13.5 16.5 2 2" />
+    </svg>
+  );
+}
 
 export function ServicesSection() {
   return (
-    <section id="servicos" className="scroll-mt-24 md:scroll-mt-28 py-20 md:py-32 px-6 md:px-12 bg-black text-white overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-16 md:mb-24 flex flex-col items-center text-center">
-          <div className="w-px h-12 bg-white/20 mb-6"></div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-gray mb-4">Nossa Atuação</p>
-          <h2 className="text-3xl md:text-5xl font-medium text-white">
-            Direções de<br />Arquitetura & Engenharia
+    <section
+      id="servicos"
+      className="scroll-mt-24 md:scroll-mt-28 py-16 md:py-[80px] px-6 md:px-12 bg-black text-white overflow-hidden"
+    >
+      <div className="max-w-[1200px] mx-auto">
+        {/* Cabeçalho da seção */}
+        <div className="mb-10 md:mb-12 text-left">
+          <p className="text-xs font-semibold tracking-widest uppercase text-neutral-400 mb-3">
+            Nossa Atuação
+          </p>
+          <h2 className="text-[32px] md:text-[48px] font-medium text-white tracking-tight leading-[1.15]">
+            Nossos serviços
           </h2>
         </div>
 
-        <div className="space-y-16 md:space-y-16">
-          {/* Serviço 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="md:col-span-6 aspect-[16/9] bg-graphite relative group border border-white/10 p-2">
-              <div className="w-full h-full relative overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop"
-                  alt="Projeto Arquitetônico — Imagem conceitual temporária"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
-                  unoptimized
-                />
-              </div>
+        {/* Grade 2x2 no desktop com 56px horizontal e 48px vertical */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-[56px] gap-y-[48px]">
+          
+          {/* Serviço 1: Projetos */}
+          <div className="border-t border-white/20 pt-6 flex items-start gap-3 md:gap-5">
+            <div className="flex-shrink-0 pt-0.5">
+              <TriangularSquareIcon className="w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" />
             </div>
-            <div className="md:col-span-5 md:col-start-8 flex flex-col justify-center">
-              <span className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-3">01.</span>
-              <h3 className="text-xl md:text-2xl font-medium mb-4">
-                Projeto<br />Arquitetônico
+            <div className="flex flex-col flex-1 min-w-0 text-left">
+              <h3 className="text-[22px] md:text-[26px] font-medium text-white tracking-tight leading-snug">
+                Projetos
               </h3>
-              <p className="text-sm text-white/70 font-light mb-6 leading-relaxed">
-                Para casas, espaços comerciais e ampliações. Traduz necessidades, rotina, terreno e investimento em organização espacial, volumetria, fachadas, conforto e funcionalidade.
+              <p className="text-[16px] md:text-[18px] text-neutral-300 font-normal leading-[1.65] mt-3">
+                Projetos arquitetônicos e complementares para uso residencial e comercial. Desenvolvemos também soluções técnicas para reformas e ampliações.
               </p>
-              <div className="w-6 h-px bg-white/30 mb-6"></div>
-              <Link
-                href="#contato"
-                className="inline-flex items-center text-[11px] font-semibold tracking-widest uppercase text-white hover:text-light-gray transition-colors"
-              >
-                Falar sobre arquitetura <MoveRightIcon className="ml-2 w-3 h-3" />
-              </Link>
             </div>
           </div>
 
-          {/* Serviço 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="order-2 md:order-1 md:col-span-4 flex flex-col justify-center md:items-end md:text-right">
-              <span className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-3">02.</span>
-              <h3 className="text-xl md:text-2xl font-medium mb-4">
-                Projetos<br />Complementares
-              </h3>
-              <p className="text-sm text-white/70 font-light mb-6 leading-relaxed">
-                Integra disciplinas necessárias à execução, reduzindo conflitos entre arquitetura, estrutura e instalações. Pode envolver projetos estrutural, elétrico, hidráulico, sanitário, lógica e mais.
-              </p>
-              <div className="w-6 h-px bg-white/30 mb-6"></div>
-              <Link
-                href="#contato"
-                className="inline-flex items-center text-[11px] font-semibold tracking-widest uppercase text-white hover:text-light-gray transition-colors"
-              >
-                Falar sobre engenharia <MoveRightIcon className="ml-2 w-3 h-3" />
-              </Link>
+          {/* Serviço 2: Obras */}
+          <div className="border-t border-white/20 pt-6 flex items-start gap-3 md:gap-5">
+            <div className="flex-shrink-0 pt-0.5">
+              <HardHatIcon className="w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" />
             </div>
-            <div className="order-1 md:order-2 md:col-span-7 md:col-start-6 aspect-[21/9] bg-graphite relative group border border-white/10 p-2">
-              <div className="w-full h-full relative overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2662&auto=format&fit=crop"
-                  alt="Projetos Complementares — Imagem conceitual temporária"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 700px"
-                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
-                  unoptimized
-                />
-              </div>
+            <div className="flex flex-col flex-1 min-w-0 text-left">
+              <h3 className="text-[22px] md:text-[26px] font-medium text-white tracking-tight leading-snug">
+                Obras
+              </h3>
+              <p className="text-[16px] md:text-[18px] text-neutral-300 font-normal leading-[1.65] mt-3">
+                Execução e acompanhamento técnico para garantir a fidelidade do projeto. Atuamos com gerenciamento e orientação em todas as etapas da obra.
+              </p>
             </div>
           </div>
 
-          {/* Serviço 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="md:col-span-5 aspect-[4/5] bg-graphite relative group border border-white/10 p-2">
-              <div className="w-full h-full relative overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop"
-                  alt="Reformas e Regularizações — Imagem conceitual temporária"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 500px"
-                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
-                  unoptimized
-                />
-              </div>
+          {/* Serviço 3: Documentação e Regularização */}
+          <div className="border-t border-white/20 pt-6 flex items-start gap-3 md:gap-5">
+            <div className="flex-shrink-0 pt-0.5">
+              <FileCheckIcon className="w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" />
             </div>
-            <div className="md:col-span-5 md:col-start-7 flex flex-col justify-center">
-              <span className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-3">03.</span>
-              <h3 className="text-xl md:text-2xl font-medium mb-4">
-                Reformas e<br />Regularizações
+            <div className="flex flex-col flex-1 min-w-0 text-left">
+              <h3 className="text-[22px] md:text-[26px] font-medium text-white tracking-tight leading-snug">
+                Documentação e Regularização
               </h3>
-              <p className="text-sm text-white/70 font-light mb-6 leading-relaxed">
-                Avalia o existente, organiza intervenções, adequações documentais e melhorias de uso, buscando adaptar o espaço às novas rotinas com segurança.
+              <p className="text-[16px] md:text-[18px] text-neutral-300 font-normal leading-[1.65] mt-3">
+                Elaboração de documentação técnica, assessoria técnica em processos de financiamento bancário e regularização de imóveis.
               </p>
-              <div className="w-6 h-px bg-white/30 mb-6"></div>
-              <Link
-                href="#contato"
-                className="inline-flex items-center text-[11px] font-semibold tracking-widest uppercase text-white hover:text-light-gray transition-colors"
-              >
-                Falar sobre reforma <MoveRightIcon className="ml-2 w-3 h-3" />
-              </Link>
             </div>
           </div>
 
-          {/* Serviço 4 */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="order-2 md:order-1 md:col-span-5 flex flex-col justify-center md:items-end md:text-right">
-              <span className="text-[11px] font-semibold tracking-widest uppercase text-gray mb-3">04.</span>
-              <h3 className="text-xl md:text-2xl font-medium mb-4">
-                Acompanhamento<br />de Obra
-              </h3>
-              <p className="text-sm text-white/70 font-light mb-6 leading-relaxed">
-                Apoia a interpretação do projeto, acompanha etapas previstas no contrato e auxilia na conferência das decisões executadas, visando a fidelidade da execução.
-              </p>
-              <div className="w-6 h-px bg-white/30 mb-6"></div>
-              <Link
-                href="#contato"
-                className="inline-flex items-center text-[11px] font-semibold tracking-widest uppercase text-white hover:text-light-gray transition-colors"
-              >
-                Falar sobre acompanhamento <MoveRightIcon className="ml-2 w-3 h-3" />
-              </Link>
+          {/* Serviço 4: Consultoria e Serviços Técnicos */}
+          <div className="border-t border-white/20 pt-6 flex items-start gap-3 md:gap-5">
+            <div className="flex-shrink-0 pt-0.5">
+              <FileSearchIcon className="w-[32px] h-[32px] md:w-[44px] md:h-[44px] text-[#c8baab]" />
             </div>
-            <div className="order-1 md:order-2 md:col-span-6 md:col-start-7 aspect-[16/9] bg-graphite relative group border border-white/10 p-2">
-              <div className="w-full h-full relative overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070&auto=format&fit=crop"
-                  alt="Acompanhamento de Obra — Imagem conceitual temporária de inspeção de engenharia no canteiro"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
-                  unoptimized
-                />
-              </div>
+            <div className="flex flex-col flex-1 min-w-0 text-left">
+              <h3 className="text-[22px] md:text-[26px] font-medium text-white tracking-tight leading-snug">
+                Consultoria e Serviços Técnicos
+              </h3>
+              <p className="text-[16px] md:text-[18px] text-neutral-300 font-normal leading-[1.65] mt-3">
+                Consultoria especializada para obras e imóveis. Realizamos inspeções prediais e emissão de laudos técnicos detalhados.
+              </p>
             </div>
           </div>
+
         </div>
       </div>
     </section>

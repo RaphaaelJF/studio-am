@@ -1,4 +1,4 @@
-﻿import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -30,6 +30,7 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "Montserrat", "system-ui", "sans-serif"],
         sans:    ["var(--font-sans)",    "Montserrat", "system-ui", "sans-serif"],
+        serif:   ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
       },
       maxWidth: {
         narrow:  "var(--container-narrow)",

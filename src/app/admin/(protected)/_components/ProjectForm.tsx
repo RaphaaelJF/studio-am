@@ -13,7 +13,7 @@ import { ArrowLeftIcon } from '@/components/shared/Icons'
 import { PROJECT_CATEGORIES, slugify, validateProjectForm } from '@/types/admin-project-form'
 import type { ProjectFormData } from '@/types/admin-project-form'
 
-import { createProjectDraft, updateProjectDraft } from '@/app/admin/actions/projects'
+import { createProjectDraft, updateProjectDraft, uploadProjectImages, publishProject, updateProjectImageMeta, setProjectCoverImage } from '@/app/admin/actions/projects'
 
 interface ProjectFormProps {
   mode: 'new' | 'edit'
@@ -97,6 +97,22 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
     }
 
     try {
+      // Locais pendentes de upload (com alt/caption/ordem/capa atuais)
+      const locals = images.filter(img => img.kind === 'local')
+      const buildUploadForm = () => {
+        const fd = new FormData()
+        locals.forEach(img => {
+          if (img.kind !== 'local') return
+          fd.append('files', img.file)
+        })
+        fd.append('meta', JSON.stringify(locals.map(img => (
+          img.kind === 'local'
+            ? { alt: img.alt, caption: img.caption, is_cover: img.is_cover, display_order: img.display_order }
+            : { alt: '', caption: '', is_cover: false, display_order: 0 }
+        ))))
+        return fd
+      }
+
       if (mode === 'new') {
         const res = await createProjectDraft(formData)
         if (!res.success) {
@@ -108,9 +124,20 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
           return
         }
 
+        const newId = res.data.id
+        if (locals.length > 0) {
+          const up = await uploadProjectImages(newId, buildUploadForm())
+          if (!up.success) {
+            toast(`Projeto criado, mas as imagens falharam: ${up.error}`, 'error')
+            setIsSaving(false)
+            router.push(`/admin/projetos/${newId}/editar`)
+            return
+          }
+        }
+
         setHasUnsavedChanges(false)
         toast('Rascunho criado com sucesso.', 'success')
-        router.push(`/admin/projetos/${res.data.id}/editar`)
+        router.push(`/admin/projetos/${newId}/editar`)
         return
       }
 
@@ -130,10 +157,30 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
         return
       }
 
+      // Persiste metadados das imagens remotas (alt/legenda) + capa
+      const remotes = images.filter(img => img.kind === 'remote')
+      for (const img of remotes) {
+        if (img.kind !== 'remote') continue
+        await updateProjectImageMeta(img.id, { alt: img.alt, caption: img.caption })
+      }
+      const coverRemote = remotes.find(img => img.kind === 'remote' && img.is_cover)
+      if (coverRemote && coverRemote.kind === 'remote') {
+        await setProjectCoverImage(projectId, coverRemote.id)
+      }
+
+      if (locals.length > 0) {
+        const up = await uploadProjectImages(projectId, buildUploadForm())
+        if (!up.success) {
+          toast(`Texto salvo, mas as imagens falharam: ${up.error}`, 'error')
+          setIsSaving(false)
+          return
+        }
+      }
+
       setHasUnsavedChanges(false)
-      toast('Rascunho atualizado com sucesso.', 'success')
+      toast('Projeto atualizado com sucesso.', 'success')
     } catch {
-      toast('Ocorreu um erro ao salvar o rascunho.', 'error')
+      toast('Ocorreu um erro ao salvar.', 'error')
     } finally {
       setIsSaving(false)
     }
@@ -147,12 +194,71 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
       setCurrentStep(1)
       return
     }
+    if (isDemo) {
+      setIsSaving(true)
+      await new Promise(r => setTimeout(r, 700))
+      setFormData(prev => ({ ...prev, status: 'published' }))
+      setIsSaving(false)
+      setHasUnsavedChanges(false)
+      toast('Publicação simulada nesta sessão. Nenhum dado foi persistido.', 'info')
+      return
+    }
+    if (!projectId) {
+      toast('Salve o rascunho antes de publicar.', 'error')
+      return
+    }
     setIsSaving(true)
-    await new Promise(r => setTimeout(r, 700))
-    setFormData(prev => ({ ...prev, status: 'published' }))
-    setIsSaving(false)
-    setHasUnsavedChanges(false)
-    toast('Publicação simulada nesta sessão. Nenhum dado foi persistido.', 'info')
+    try {
+      // Garante texto + imagens persistidos antes de publicar
+      const upd = await updateProjectDraft(projectId, formData)
+      if (!upd.success) {
+        toast(upd.error, 'error')
+        setIsSaving(false)
+        return
+      }
+      const remotes = images.filter(img => img.kind === 'remote')
+      for (const img of remotes) {
+        if (img.kind !== 'remote') continue
+        await updateProjectImageMeta(img.id, { alt: img.alt, caption: img.caption })
+      }
+      const coverRemote = remotes.find(img => img.kind === 'remote' && img.is_cover)
+      if (coverRemote && coverRemote.kind === 'remote') {
+        await setProjectCoverImage(projectId, coverRemote.id)
+      }
+      const locals = images.filter(img => img.kind === 'local')
+      if (locals.length > 0) {
+        const fd = new FormData()
+        locals.forEach(img => {
+          if (img.kind !== 'local') return
+          fd.append('files', img.file)
+        })
+        fd.append('meta', JSON.stringify(locals.map(img => (
+          img.kind === 'local'
+            ? { alt: img.alt, caption: img.caption, is_cover: img.is_cover, display_order: img.display_order }
+            : { alt: '', caption: '', is_cover: false, display_order: 0 }
+        ))))
+        const up = await uploadProjectImages(projectId, fd)
+        if (!up.success) {
+          toast(`Não foi possível enviar as imagens: ${up.error}`, 'error')
+          setIsSaving(false)
+          return
+        }
+      }
+
+      const pub = await publishProject(projectId, { featured: formData.featured, display_order: formData.display_order })
+      if (!pub.success) {
+        toast(pub.error, 'error')
+        setIsSaving(false)
+        return
+      }
+      setFormData(prev => ({ ...prev, status: 'published' }))
+      setHasUnsavedChanges(false)
+      toast('Projeto publicado com sucesso.', 'success')
+    } catch {
+      toast('Ocorreu um erro ao publicar.', 'error')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const navigateWithGuard = (href: string) => {

@@ -68,6 +68,30 @@ export default async function EditProjectPage({ params, searchParams }: PageProp
   if (!data) return notFound()
 
   const project = data as DbProject
+
+  // Carrega imagens reais do banco + URLs públicas do Storage
+  const { data: imageRows } = await supabase
+    .from('project_images')
+    .select('id, storage_path, alt, caption, display_order, is_cover')
+    .eq('project_id', id)
+    .order('display_order', { ascending: true })
+
+  const initialImages = ((imageRows ?? []) as {
+    id: string; storage_path: string; alt: string; caption: string | null; display_order: number; is_cover: boolean
+  }[]).map((img) => {
+    const path = (img.storage_path.startsWith('http') || img.storage_path.startsWith('/'))
+      ? img.storage_path
+      : supabase.storage.from('project-images').getPublicUrl(img.storage_path.replace(/^project-images\//, '')).data.publicUrl
+    return {
+      kind: 'remote' as const,
+      id: img.id,
+      storageUrl: path,
+      alt: img.alt ?? '',
+      caption: img.caption ?? '',
+      is_cover: img.is_cover,
+      display_order: img.display_order,
+    }
+  })
   const initialFormData: ProjectFormData = {
     title: project.title,
     slug: project.slug,
@@ -83,7 +107,7 @@ export default async function EditProjectPage({ params, searchParams }: PageProp
   }
 
   return (
-    <ProjectDraftProvider draftKey={id} initialFormData={initialFormData}>
+    <ProjectDraftProvider draftKey={id} initialFormData={initialFormData} initialImages={initialImages}>
       {backLink}
       <ProjectForm mode="edit" backUrl={backUrl} isDemo={isDemo} projectId={id} />
     </ProjectDraftProvider>

@@ -1,11 +1,13 @@
-import { HeroSection } from "@/sections/home/HeroSection";
-import { ManifestoSection } from "@/sections/home/ManifestoSection";
+import { HeroSection } from "@/sections/home/HeroSection";import { ManifestoSection } from "@/sections/home/ManifestoSection";
 import { SelectedProjectsSection } from "@/sections/home/SelectedProjectsSection";
 import { StudioIntroSection } from "@/sections/home/StudioIntroSection";
 import { FeaturedProjectSection } from "@/sections/home/FeaturedProjectSection";
 import { ServicesSection } from "@/sections/home/ServicesSection";
 import { MethodSection } from "@/sections/home/MethodSection";
 import { ContactSection } from "@/sections/home/ContactSection";
+
+// Revalida a home a cada 60s para refletir publicações sem rebuild.
+export const revalidate = 60
 
 /**
  * Home Page — Ordem oficial Studio AM V2.5

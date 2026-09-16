@@ -3,6 +3,7 @@
 import React, { useRef } from 'react'
 import { useImageManager } from './ProjectDraftProvider'
 import { ConfirmDialog } from './ConfirmDialog'
+import { deleteProjectImage } from '@/app/admin/actions/projects'
 import {
   ImageIcon, TrashIcon, CheckIcon,
   ChevronUpIcon, ChevronDownIcon,
@@ -62,7 +63,7 @@ export function ProjectGalleryEditor() {
       {/* Guidance */}
       {images.length === 0 && (
         <p className="text-[11px] text-muted leading-relaxed">
-          Nenhuma imagem adicionada. As imagens existirão somente como prévia local nesta sessão — nenhum upload será enviado ao servidor.
+          Nenhuma imagem adicionada. Selecione arquivos JPEG, PNG ou WebP (máx. 5 MB cada) — elas serão enviadas ao clicar em Salvar.
         </p>
       )}
 
@@ -191,7 +192,7 @@ export function ProjectGalleryEditor() {
                     Usar como capa
                   </label>
                   {img.kind === 'local' && (
-                    <span className="text-[10px] text-muted italic">Mantida somente nesta sessão</span>
+                    <span className="text-[10px] text-muted italic">Será enviada ao salvar</span>
                   )}
                 </div>
               </div>
@@ -207,7 +208,16 @@ export function ProjectGalleryEditor() {
         description="Tem certeza que deseja remover esta imagem da galeria? Se for a capa, uma nova capa deverá ser definida."
         confirmLabel="Remover"
         onConfirm={() => {
-          if (deleteTarget) removeImage(deleteTarget)
+          if (deleteTarget) {
+            const target = images.find(img =>
+              img.kind === 'local' ? img.localId === deleteTarget : img.id === deleteTarget
+            )
+            // Imagem já salva no banco: remove de verdade (storage + banco)
+            if (target?.kind === 'remote') {
+              deleteProjectImage(target.id).catch(() => {})
+            }
+            removeImage(deleteTarget)
+          }
           setDeleteTarget(null)
         }}
         onCancel={() => setDeleteTarget(null)}
