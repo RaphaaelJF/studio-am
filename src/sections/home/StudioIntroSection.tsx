@@ -53,12 +53,13 @@ export function StudioIntroSection() {
             </div>
           </div>
 
-          {/* CTA editorial discreto para /studio */}
+          {/* CTA editorial para /studio */}
           <Link
             href="/studio"
-            className="inline-flex items-center text-xs font-semibold tracking-widest uppercase text-neutral-700 hover:text-neutral-900 transition-colors gap-2"
+            className="inline-flex items-center gap-3 mt-2 text-sm font-semibold tracking-[0.16em] uppercase text-neutral-900 hover:text-[#8C7A6B] transition-colors duration-200 py-3 group"
           >
-            Conheça o Studio <span aria-hidden="true">→</span>
+            Conheça o Studio AM
+            <span aria-hidden="true" className="text-base transition-transform duration-200 group-hover:translate-x-1">→</span>
           </Link>
         </div>
       </div>

@@ -204,13 +204,17 @@ export function MethodSection() {
           ))}
         </ol>
 
-        {/* CTA editorial discreto para /metodo */}
-        <div className="mt-12 text-center">
+        {/* CTA editorial para /metodo */}
+        <div className="mt-14 text-center">
+          <p className="text-[#666666] text-[0.95rem] font-normal mb-3">
+            Conheça cada etapa em detalhes.
+          </p>
           <Link
             href="/metodo"
-            className="inline-flex items-center text-xs font-semibold tracking-widest uppercase text-[#8C7A6B] hover:text-[#1A1A1A] transition-colors gap-2"
+            className="inline-flex items-center gap-3 text-sm font-semibold tracking-[0.16em] uppercase text-[#1A1A1A] hover:text-[#8C7A6B] transition-colors duration-200 py-3 group"
           >
-            Conheça o método completo <span aria-hidden="true">→</span>
+            Ver o método completo
+            <span aria-hidden="true" className="text-base transition-transform duration-200 group-hover:translate-x-1">→</span>
           </Link>
         </div>
       </div>
