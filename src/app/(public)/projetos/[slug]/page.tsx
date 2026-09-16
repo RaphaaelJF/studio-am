@@ -3,7 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getPublishedProjects, getPublishedProjectBySlug } from '@/lib/projects-public';
+import { getPublishedProjectBySlug } from '@/lib/projects-public';
+import { portfolioProjects } from '@/data/home-projects';
 import { ArrowLeftIcon, MoveRightIcon } from '@/components/shared/Icons';
 
 interface ProjectDetailPageProps {
@@ -14,12 +15,12 @@ interface ProjectDetailPageProps {
 // são gerados sob demanda (dynamicParams padrão).
 export const revalidate = 60
 
+// Usa os dados mock locais para gerar os parâmetros estáticos —
+// evita chamar cookies() fora do contexto de request.
 export async function generateStaticParams() {
-  const projects = await getPublishedProjects();
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+  return portfolioProjects.map((p) => ({ slug: p.slug }));
 }
+
 
 export async function generateMetadata({
   params,
