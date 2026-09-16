@@ -51,14 +51,14 @@ export function HeroSection() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 items-start">
             <Link
-              href="#contato"
+              href="/#contato"
               className="inline-flex items-center justify-center bg-[#171717] text-white px-8 py-4 min-h-[48px] font-semibold uppercase tracking-wider text-xs hover:bg-[#2b2b2a] transition-colors"
             >
               Iniciar um projeto
               <MoveRightIcon className="ml-3 w-3 h-3" />
             </Link>
             <Link
-              href="#projetos"
+              href="/#projetos"
               className="inline-flex items-center justify-center bg-transparent border border-[#171717]/30 text-[#171717] px-8 py-4 min-h-[48px] font-semibold uppercase tracking-wider text-xs hover:border-[#171717] hover:bg-black/5 transition-colors"
             >
               Ver projetos

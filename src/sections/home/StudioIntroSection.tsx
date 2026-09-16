@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export function StudioIntroSection() {
   return (
@@ -38,7 +39,7 @@ export function StudioIntroSection() {
             </p>
           </div>
 
-          <div className="pt-8 border-t border-black/10 grid grid-cols-2 gap-8 relative">
+          <div className="pt-8 border-t border-black/10 grid grid-cols-2 gap-8 relative mb-10">
             <div className="absolute -top-px left-0 w-12 h-px bg-neutral-900"></div>
             <div>
               <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-1.5">Responsável</p>
@@ -47,10 +48,18 @@ export function StudioIntroSection() {
             </div>
             <div>
               <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-1.5">Atuação</p>
-              <p className="text-neutral-900 font-medium text-base md:text-[17px]">Projetos & Obras</p>
+              <p className="text-neutral-900 font-medium text-base md:text-[17px]">Projetos &amp; Obras</p>
               <p className="text-sm text-neutral-600 font-normal mt-0.5">Atendimento presencial e remoto</p>
             </div>
           </div>
+
+          {/* CTA editorial discreto para /studio */}
+          <Link
+            href="/studio"
+            className="inline-flex items-center text-xs font-semibold tracking-widest uppercase text-neutral-700 hover:text-neutral-900 transition-colors gap-2"
+          >
+            Conheça o Studio <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </section>

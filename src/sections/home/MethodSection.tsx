@@ -1,4 +1,5 @@
 import React from "react";
+import Link from 'next/link';
 
 /* ── Ilustrações da seção O Processo (visuais fornecidos, uso exato) ── */
 
@@ -202,6 +203,16 @@ export function MethodSection() {
             </li>
           ))}
         </ol>
+
+        {/* CTA editorial discreto para /metodo */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/metodo"
+            className="inline-flex items-center text-xs font-semibold tracking-widest uppercase text-[#8C7A6B] hover:text-[#1A1A1A] transition-colors gap-2"
+          >
+            Conheça o método completo <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
     </section>
   );

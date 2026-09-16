@@ -30,7 +30,7 @@ export function SiteHeader() {
 
       {/* CTA Iniciar Projeto — visible xl+ only, same breakpoint as nav */}
       <Link
-        href="/#contato"
+        href="/contato"
         className="hidden xl:inline-flex items-center justify-center gap-2 bg-[#c8baab] text-black px-6 min-h-[44px] text-xs font-semibold tracking-widest uppercase hover:bg-black hover:text-white transition-colors duration-normal focus-visible:outline-black flex-shrink-0"
       >
         Iniciar Projeto
@@ -63,7 +63,7 @@ export function SiteHeader() {
           ))}
           {/* CTA no menu mobile */}
           <Link
-            href="/#contato"
+            href="/contato"
             onClick={() => setIsMenuOpen(false)}
             className="mt-4 inline-flex items-center justify-center gap-2 bg-[#c8baab] text-black px-6 min-h-[44px] text-xs font-semibold tracking-widest uppercase hover:bg-black hover:text-white transition-colors"
           >
