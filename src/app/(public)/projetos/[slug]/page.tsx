@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import { getPublishedProjectBySlug } from '@/lib/projects-public';
 import { portfolioProjects } from '@/data/home-projects';
 import { ArrowLeftIcon, MoveRightIcon } from '@/components/shared/Icons';
+import { ProjectGallery } from '@/components/shared/ProjectGallery';
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -76,7 +77,7 @@ export default async function ProjectDetailPage({
             {project.location ? ` — ${project.location}` : ''}
             {project.year ? ` · ${project.year}` : ''}
           </p>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-[#171717] leading-tight">
+          <h1 className="text-3xl md:text-6xl lg:text-7xl font-medium tracking-tight text-[#171717] leading-tight">
             {project.title}
           </h1>
           {project.summary && (
@@ -131,44 +132,29 @@ export default async function ProjectDetailPage({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            {project.gallery.map((image, index) => (
-              <figure key={`${image.src}-${index}`} className="flex flex-col">
-                <div className="relative aspect-[16/9] overflow-hidden bg-light-gray mb-3">
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 700px"
-                    className="object-contain transition-transform duration-700 hover:scale-[1.02]"
-                  />
-                </div>
-                <figcaption className="text-sm text-[#595959] font-normal leading-[1.6]">
-                  {image.alt}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <ProjectGallery gallery={project.gallery} />
         </section>
 
-        {/* Seção de Contato / Chamada para Ação */}
+        {/* Seção de Contato / Chamada para Ação LOCAL */}
         <section className="border-t border-light-gray pt-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
             <h3 className="text-2xl md:text-3xl font-medium text-[#171717] tracking-tight mb-2">
               Deseja conversar sobre o seu projeto?
             </h3>
             <p className="text-[#404040] text-base md:text-[17px] font-normal leading-[1.7] max-w-xl">
-              Entre em contato com o Studio AM para avaliar a viabilidade arquitetônica e estrutural da sua construção ou reforma.
+              Entre em contato para avaliar a viabilidade arquitetônica e estrutural da sua obra.
             </p>
           </div>
           <Link
-            href="/#contato"
+            href="/contato"
             className="inline-flex items-center justify-center gap-3 bg-[#c8baab] text-[#171717] px-8 py-4 text-xs font-semibold tracking-wider uppercase hover:bg-[#171717] hover:text-white transition-colors duration-200 flex-shrink-0"
           >
             Falar sobre meu projeto
             <MoveRightIcon className="w-3.5 h-3.5" />
           </Link>
         </section>
+
+
       </div>
     </article>
   );

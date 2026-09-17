@@ -69,8 +69,8 @@ export default async function ProjectsPage() {
                     />
                   </div>
 
-                  <div className="flex justify-between items-start">
-                    <div>
+                  <div className="flex flex-wrap items-start justify-between gap-y-3 gap-x-4">
+                    <div className="max-w-full">
                       <h2 className="text-xl md:text-2xl font-medium text-[#171717] mb-1.5 group-hover:text-[#404040] transition-colors">
                         {project.title}
                       </h2>
@@ -78,8 +78,8 @@ export default async function ProjectsPage() {
                         {project.category}
                       </p>
                     </div>
-                    <div className="flex items-center text-xs font-semibold tracking-wider uppercase text-[#171717] group-hover:text-[#404040] transition-colors">
-                      Ver projeto <ArrowUpRightIcon className="ml-2 w-4 h-4" />
+                    <div className="flex items-center text-xs font-semibold tracking-wider uppercase text-[#171717] group-hover:text-[#404040] transition-colors shrink-0 whitespace-nowrap mt-1 md:mt-1.5">
+                      Ver projeto <ArrowUpRightIcon className="ml-2 w-4 h-4 shrink-0" />
                     </div>
                   </div>
                 </Link>

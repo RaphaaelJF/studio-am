@@ -1,6 +1,6 @@
 import { SkipLink } from "@/components/navigation/SkipLink";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 export default function PublicLayout({
   children,
@@ -14,7 +14,7 @@ export default function PublicLayout({
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <SiteFooter />
+      <PublicFooter />
     </>
   );
 }

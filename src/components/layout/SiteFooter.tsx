@@ -56,7 +56,7 @@ function ArrowUpRightDiagonalIcon({ className = "w-3.5 h-3.5" }: { className?: s
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ showContactCta = true }: { showContactCta?: boolean }) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -65,7 +65,7 @@ export function SiteFooter() {
     <footer className="bg-warm-white text-black py-14 md:py-16 px-6 md:px-12 border-t border-black/5">
       <div className="max-w-[1200px] mx-auto">
         {/* Bloco Principal em 2 colunas (desktop) ou empilhado (mobile) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div className={`grid grid-cols-1 ${showContactCta ? 'md:grid-cols-2' : ''} gap-8 lg:gap-12 items-start`}>
           
           {/* Coluna 1: Marca e descrição */}
           <div className="flex flex-col items-start text-left">
@@ -88,46 +88,48 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {/* Coluna 2: “Converse com a Anne” */}
-          <div className="flex flex-col items-start text-left">
-            <h3 className="text-[20px] font-medium text-[#171717] mb-4">
-              Converse com a Anne
-            </h3>
-            <div className="flex flex-col space-y-3 w-full">
-              {/* WhatsApp */}
-              <a
-                href={CONTACT_INFO.whatsapp.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-[12px] p-1 -ml-1 rounded-sm text-[#404040] select-none cursor-pointer hover:underline focus-visible:outline-black focus-visible:outline-offset-2 group"
-                title="Conversar no WhatsApp"
-              >
-                <div className="w-[44px] h-[44px] rounded-[10px] bg-[#25D366] flex items-center justify-center flex-shrink-0">
-                  <WhatsAppIcon className="w-[26px] h-[26px] text-white" />
-                </div>
-                <span className="text-[16px] font-normal text-[#404040]">WhatsApp</span>
-                <ArrowUpRightDiagonalIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
-              </a>
-
-              {/* Instagram */}
-              <a
-                href={CONTACT_INFO.instagram.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-[12px] p-1 -ml-1 rounded-sm text-[#404040] select-none cursor-pointer hover:underline focus-visible:outline-black focus-visible:outline-offset-2 group"
-                title="Acessar Instagram"
-              >
-                <div 
-                  className="w-[44px] h-[44px] rounded-[10px] flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'linear-gradient(45deg, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)' }}
+          {/* Coluna 2: “Converse com a Anne” — visível apenas quando showContactCta for true */}
+          {showContactCta && (
+            <div className="flex flex-col items-start text-left">
+              <h3 className="text-[20px] font-medium text-[#171717] mb-4">
+                Converse com a Anne
+              </h3>
+              <div className="flex flex-col space-y-3 w-full">
+                {/* WhatsApp */}
+                <a
+                  href={CONTACT_INFO.whatsapp.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-[12px] p-1 -ml-1 rounded-sm text-[#404040] select-none cursor-pointer hover:underline focus-visible:outline-black focus-visible:outline-offset-2 group"
+                  title="Conversar no WhatsApp"
                 >
-                  <InstagramIcon className="w-[26px] h-[26px]" />
-                </div>
-                <span className="text-[16px] font-normal text-[#404040]">Instagram</span>
-                <ArrowUpRightDiagonalIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
-              </a>
+                  <div className="w-[44px] h-[44px] rounded-[10px] bg-[#25D366] flex items-center justify-center flex-shrink-0">
+                    <WhatsAppIcon className="w-[26px] h-[26px] text-white" />
+                  </div>
+                  <span className="text-[16px] font-normal text-[#404040]">WhatsApp</span>
+                  <ArrowUpRightDiagonalIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
+                </a>
+
+                {/* Instagram */}
+                <a
+                  href={CONTACT_INFO.instagram.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-[12px] p-1 -ml-1 rounded-sm text-[#404040] select-none cursor-pointer hover:underline focus-visible:outline-black focus-visible:outline-offset-2 group"
+                  title="Acessar Instagram"
+                >
+                  <div 
+                    className="w-[44px] h-[44px] rounded-[10px] flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'linear-gradient(45deg, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)' }}
+                  >
+                    <InstagramIcon className="w-[26px] h-[26px]" />
+                  </div>
+                  <span className="text-[16px] font-normal text-[#404040]">Instagram</span>
+                  <ArrowUpRightDiagonalIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-700 transition-colors" />
+                </a>
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
 

@@ -5,4 +5,5 @@ export const mainNavItems: NavItem[] = [
   { label: 'Serviços', href: '/#servicos' },
   { label: 'Processo', href: '/#processo' },
   { label: 'Sobre', href: '/#sobre' },
+  { label: 'Contato', href: '/contato' },
 ];

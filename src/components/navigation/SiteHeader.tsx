@@ -39,15 +39,6 @@ export function SiteHeader() {
       {/* Desktop Navigation — visible lg+ only */}
       <DesktopNavigation />
 
-      {/* CTA Iniciar Projeto — visible xl+ only, same breakpoint as nav */}
-      <Link
-        href="/contato"
-        className="hidden xl:inline-flex items-center justify-center gap-2 bg-[#c8baab] text-black px-6 min-h-[44px] text-xs font-semibold tracking-widest uppercase hover:bg-black hover:text-white transition-colors duration-normal focus-visible:outline-black flex-shrink-0"
-      >
-        Iniciar Projeto
-        <span aria-hidden="true">→</span>
-      </Link>
-
       {/* Mobile Nav Toggle — visible below xl */}
       <button
         type="button"
@@ -99,14 +90,6 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            {/* CTA no menu mobile */}
-            <Link
-              href="/contato"
-              onClick={() => setIsMenuOpen(false)}
-              className="mt-6 inline-flex items-center justify-center gap-2 bg-[#c8baab] text-black px-8 min-h-[48px] text-xs font-semibold tracking-widest uppercase hover:bg-black hover:text-white transition-colors"
-            >
-              Iniciar Projeto →
-            </Link>
           </div>
 
           {/* Bottom spacer for balance */}

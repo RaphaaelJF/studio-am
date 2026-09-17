@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { CONTACT_INFO } from '@/data/studio';
-import { ChevronDownIcon } from '@/components/shared/Icons';
+import { ChevronDownIcon, InstagramIcon } from '@/components/shared/Icons';
 
 const PROJECT_OPTIONS = [
   'Construção Residencial',
@@ -50,7 +50,7 @@ export default function ContactPage() {
             Vamos falar sobre o seu projeto.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-[#404040] max-w-2xl font-normal leading-relaxed">
-            Inicie a conversa diretamente pelo WhatsApp ou envie as informações preliminares no formulário abaixo para agendarmos uma primeira reunião.
+            Envie as informações preliminares no formulário abaixo para iniciarmos o atendimento e alinharmos os primeiros passos do seu projeto.
           </p>
         </div>
       </section>
@@ -58,65 +58,70 @@ export default function ContactPage() {
       {/* Conteúdo Principal: Informações de Contato + Formulário */}
       <section className="py-20 md:py-28 px-6 md:px-12 bg-warm-white">
         <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-          {/* Coluna Esquerda: Canais Diretos */}
+          {/* Coluna Esquerda: Informações Institucionais e Atendimento */}
           <div className="lg:col-span-5 space-y-10">
             <div>
-              <h2 className="text-2xl font-medium text-[#171717] mb-4">
-                Atendimento Direto
+              <p className="text-xs font-semibold tracking-widest uppercase text-neutral-700 mb-2">
+                Informações de Contato
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-4">
+                Atendimento
               </h2>
-              <p className="text-[#404040] text-base leading-relaxed">
-                Priorizamos a agilidade e o contato direto com a Anne Martins para tirar dúvidas sobre viabilidade, prazos e escopo.
+              <p className="text-neutral-700 text-base leading-relaxed">
+                Priorizamos a agilidade e o contato direto para tirar dúvidas sobre viabilidade, prazos e escopo do seu projeto.
               </p>
             </div>
 
-            {/* Cartões de Contato Rápido — dispostos verticalmente no mobile e flex/row no desktop */}
-            <div className="space-y-4">
-              <a
-                href={CONTACT_INFO.whatsapp.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group gap-4 sm:gap-0"
-              >
-                <div>
-                  <span className="text-xs uppercase tracking-widest text-[#8C7A6B] font-semibold block mb-1">
-                    WhatsApp Comercial
-                  </span>
-                  <span className="text-lg font-medium text-[#171717] block">
-                    {CONTACT_INFO.whatsapp.number}
-                  </span>
-                </div>
-                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform sm:self-auto self-start">
-                  Conversar →
+            <div className="space-y-6">
+              <div className="border-t border-neutral-200 pt-6">
+                <span className="text-xs uppercase tracking-widest text-neutral-800 font-semibold block mb-2">
+                  Atendimento
                 </span>
-              </a>
+                <p className="text-sm text-neutral-600">
+                  Segunda a Sexta, das 09h às 18h.
+                </p>
+              </div>
 
-              <a
-                href={CONTACT_INFO.instagram.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group gap-4 sm:gap-0"
-              >
-                <div>
-                  <span className="text-xs uppercase tracking-widest text-[#8C7A6B] font-semibold block mb-1">
-                    Instagram Oficial
-                  </span>
-                  <span className="text-lg font-medium text-[#171717] block">
-                    @_stdam
-                  </span>
-                </div>
-                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform sm:self-auto self-start">
-                  Acompanhar →
+              <div className="border-t border-neutral-200 pt-6">
+                <span className="text-xs uppercase tracking-widest text-neutral-800 font-semibold block mb-2">
+                  Atuação
                 </span>
-              </a>
-            </div>
+                <p className="text-sm text-neutral-600">
+                  Projetos e acompanhamentos presenciais e remotos.
+                </p>
+              </div>
 
-            <div className="border-t border-light-gray pt-8 text-sm text-[#595959] space-y-2">
-              <p>
-                <strong className="text-[#171717] font-medium">Horário de Atendimento:</strong> Segunda a Sexta, das 09h às 18h.
-              </p>
-              <p>
-                <strong className="text-[#171717] font-medium">Atuação:</strong> Projetos e acompanhamentos presenciais e remotos.
-              </p>
+              <div className="border-t border-zinc-300 pt-6">
+                <span className="text-xs uppercase tracking-wider text-zinc-900 font-bold block mb-2">
+                  Instagram
+                </span>
+                <a
+                  href={CONTACT_INFO.instagram.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 bg-white border border-zinc-200 hover:border-zinc-400 hover:shadow-md transition-all group rounded-none"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div 
+                      className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0 shadow-xs group-hover:scale-105 transition-transform"
+                      style={{ background: 'linear-gradient(45deg, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)' }}
+                    >
+                      <InstagramIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-zinc-900 group-hover:text-black leading-tight">
+                        @_stdam
+                      </p>
+                      <p className="text-xs text-zinc-700 font-medium mt-0.5 leading-tight">
+                        Acompanhe projetos e bastidores
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xs uppercase tracking-wider text-zinc-900 font-bold group-hover:translate-x-1 transition-transform pl-3">
+                    →
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -127,7 +132,7 @@ export default function ContactPage() {
                 Formulário Inicial
               </span>
               <h3 className="text-2xl md:text-3xl font-medium text-white tracking-tight">
-                Conte-nos sobre sua ideia
+                Conte sobre seu projeto
               </h3>
             </div>
 
@@ -178,7 +183,7 @@ export default function ContactPage() {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="w-full bg-[#111518] border border-white/15 p-4 text-left text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base cursor-pointer flex items-center justify-between"
                   >
-                    <span className="truncate pr-3">{tipo}</span>
+                    <span className="pr-3 break-words whitespace-normal leading-snug">{tipo}</span>
                     <ChevronDownIcon className={`w-4 h-4 text-neutral-400 shrink-0 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-white' : ''}`} />
                   </button>
 
@@ -196,15 +201,14 @@ export default function ContactPage() {
                             setTipo(opt);
                             setIsDropdownOpen(false);
                           }}
-                          className={`px-4 py-3 text-sm cursor-pointer transition-colors flex items-center justify-between ${
-                            tipo === opt
+                          className={`px-4 py-3 text-sm cursor-pointer transition-colors flex items-start justify-between gap-3 ${tipo === opt
                               ? 'bg-white/10 text-white font-medium'
                               : 'text-neutral-300 hover:bg-white/5 hover:text-white'
-                          }`}
+                            }`}
                         >
-                          <span>{opt}</span>
+                          <span className="break-words whitespace-normal leading-snug">{opt}</span>
                           {tipo === opt && (
-                            <span className="text-[#c8baab] text-xs uppercase tracking-wider font-semibold">✓</span>
+                            <span className="text-[#c8baab] text-xs uppercase tracking-wider font-semibold mt-0.5 shrink-0">✓</span>
                           )}
                         </li>
                       ))}
@@ -223,8 +227,11 @@ export default function ContactPage() {
                   value={mensagem}
                   onChange={(e) => setMensagem(e.target.value)}
                   className="w-full bg-white/5 border border-white/15 p-4 text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base resize-none placeholder:text-white/30"
-                  placeholder="Compartilhe metragem aproximada, se já possui terreno, prazos pretendidos ou suas principais dúvidas..."
+                  placeholder="Conte um pouco sobre o seu projeto..."
                 />
+                <p className="text-[#a3a3a3] text-xs mt-2 leading-relaxed">
+                  Opcional: compartilhe metragem aproximada, se já possui terreno, prazos pretendidos ou suas principais dúvidas.
+                </p>
               </div>
 
               <button
@@ -232,11 +239,11 @@ export default function ContactPage() {
                 className="w-full bg-[#c8baab] text-[#171717] py-4 px-6 sm:px-8 text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer text-center block"
               >
                 <span className="sm:hidden">Abrir WhatsApp →</span>
-                <span className="hidden sm:inline">Enviar e Iniciar Conversa no WhatsApp →</span>
+                <span className="hidden sm:inline">Enviar pelo WhatsApp →</span>
               </button>
 
               <p className="text-xs text-neutral-400 text-center font-normal">
-                Ao clicar, você será direcionado para o WhatsApp com os dados preenchidos.
+                Após o envio, a conversa continuará no WhatsApp.
               </p>
             </form>
           </div>
