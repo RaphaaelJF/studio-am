@@ -66,9 +66,9 @@ export function HeroSection() {
           </div>
 
           {/* Editorial anchors — desktop only */}
-          <div className="hidden lg:flex items-stretch gap-4 mt-8 lg:mt-10 text-[10px] leading-[1.6] font-semibold tracking-[0.3em] uppercase text-black/40">
-            <div className="w-[1px] bg-black/20"></div>
-            <div className="flex flex-col justify-between py-0.5 gap-2">
+          <div className="hidden lg:flex items-stretch gap-4 mt-8 lg:mt-10 text-[11px] font-medium tracking-[0.18em] uppercase text-neutral-700">
+            <div className="w-px bg-neutral-300"></div>
+            <div className="flex flex-col justify-between py-1 gap-2">
               <span>Espaços</span>
               <span>Pessoas</span>
               <span>Propósito</span>
