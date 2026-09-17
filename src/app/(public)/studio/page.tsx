@@ -35,11 +35,11 @@ export default function StudioPage() {
       </section>
 
       {/* Seção Anne Martins — Apresentação Profissional */}
-      <section className="py-20 md:py-28 px-6 md:px-12 bg-beige">
-        <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+      <section className="py-14 md:py-28 px-6 md:px-12 bg-beige">
+        <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20 items-center">
           {/* Retrato Profissional */}
           <div className="lg:col-span-5">
-            <div className="relative aspect-[4/5] w-full max-w-md mx-auto lg:mx-0 bg-warm-white border border-light-gray p-3 shadow-sm">
+            <div className="relative aspect-[4/5] w-full max-w-[340px] sm:max-w-md mx-auto lg:mx-0 bg-warm-white border border-light-gray p-3 shadow-sm">
               <div className="w-full h-full relative overflow-hidden bg-light-gray">
                 <Image
                   src="/images/anne/anne-martins.webp"
@@ -55,7 +55,7 @@ export default function StudioPage() {
 
           {/* Biografia e Postura */}
           <div className="lg:col-span-7 flex flex-col justify-center">
-            <div className="mb-6">
+            <div className="mb-5 md:mb-6">
               <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2">
                 Direção Técnica
               </p>
