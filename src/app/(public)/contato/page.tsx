@@ -146,18 +146,20 @@ export default function ContactPage() {
                 <label htmlFor="contato-tipo" className="text-xs font-semibold tracking-widest uppercase text-[#a3a3a3] block">
                   Tipo de Projeto *
                 </label>
-                <select
-                  id="contato-tipo"
-                  value={tipo}
-                  onChange={(e) => setTipo(e.target.value)}
-                  className="w-full bg-[#111518] border border-white/15 p-4 text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base cursor-pointer"
-                >
-                  <option value="Construção Residencial">Construção Residencial</option>
-                  <option value="Projeto Comercial">Projeto Comercial</option>
-                  <option value="Reforma ou Ampliação">Reforma ou Ampliação</option>
-                  <option value="Projetos Complementares / Estrutural">Projetos Complementares / Estrutural</option>
-                  <option value="Regularização ou Acompanhamento">Regularização ou Acompanhamento</option>
-                </select>
+                <div className="relative w-full">
+                  <select
+                    id="contato-tipo"
+                    value={tipo}
+                    onChange={(e) => setTipo(e.target.value)}
+                    className="w-full bg-[#111518] border border-white/15 p-4 pr-10 text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base cursor-pointer"
+                  >
+                    <option value="Construção Residencial">Construção Residencial</option>
+                    <option value="Projeto Comercial">Projeto Comercial</option>
+                    <option value="Reforma ou Ampliação">Reforma ou Ampliação</option>
+                    <option value="Projetos Complementares / Estrutural">Projetos Complementares / Estrutural</option>
+                    <option value="Regularização ou Acompanhamento">Regularização ou Acompanhamento</option>
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -176,9 +178,10 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full bg-[#c8baab] text-[#171717] py-4 px-8 text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer text-center block"
+                className="w-full bg-[#c8baab] text-[#171717] py-4 px-6 sm:px-8 text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer text-center block"
               >
-                Enviar e Iniciar Conversa no WhatsApp →
+                <span className="sm:hidden">Continuar no WhatsApp →</span>
+                <span className="hidden sm:inline">Enviar e Iniciar Conversa no WhatsApp →</span>
               </button>
 
               <p className="text-xs text-neutral-400 text-center font-normal">
