@@ -1,13 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CONTACT_INFO } from '@/data/studio';
+import { ChevronDownIcon } from '@/components/shared/Icons';
+
+const PROJECT_OPTIONS = [
+  'Construção Residencial',
+  'Reforma',
+  'Comercial',
+  'Projetos Complementares / Estrutural',
+  'Regularização ou Acompanhamento',
+];
 
 export default function ContactPage() {
   const [nome, setNome] = useState('');
   const [cidade, setCidade] = useState('');
   const [tipo, setTipo] = useState('Construção Residencial');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fechar dropdown customizado ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,23 +69,23 @@ export default function ContactPage() {
               </p>
             </div>
 
-            {/* Cartões de Contato Rápido */}
+            {/* Cartões de Contato Rápido — dispostos verticalmente no mobile e flex/row no desktop */}
             <div className="space-y-4">
               <a
                 href={CONTACT_INFO.whatsapp.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group gap-4 sm:gap-0"
               >
                 <div>
                   <span className="text-xs uppercase tracking-widest text-[#8C7A6B] font-semibold block mb-1">
                     WhatsApp Comercial
                   </span>
-                  <span className="text-lg font-medium text-[#171717]">
+                  <span className="text-lg font-medium text-[#171717] block">
                     {CONTACT_INFO.whatsapp.number}
                   </span>
                 </div>
-                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform">
+                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform sm:self-auto self-start">
                   Conversar →
                 </span>
               </a>
@@ -72,17 +94,17 @@ export default function ContactPage() {
                 href={CONTACT_INFO.instagram.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-beige border border-light-gray hover:border-[#8C7A6B] transition-colors group gap-4 sm:gap-0"
               >
                 <div>
                   <span className="text-xs uppercase tracking-widest text-[#8C7A6B] font-semibold block mb-1">
                     Instagram Oficial
                   </span>
-                  <span className="text-lg font-medium text-[#171717]">
+                  <span className="text-lg font-medium text-[#171717] block">
                     @_stdam
                   </span>
                 </div>
-                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform">
+                <span className="text-xs uppercase tracking-wider font-semibold text-[#171717] group-hover:translate-x-1 transition-transform sm:self-auto self-start">
                   Acompanhar →
                 </span>
               </a>
@@ -142,23 +164,52 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="contato-tipo" className="text-xs font-semibold tracking-widest uppercase text-[#a3a3a3] block">
+              {/* Seletor Customizado — Sem truncamento no mobile */}
+              <div className="space-y-2" ref={dropdownRef}>
+                <label id="contato-tipo-label" className="text-xs font-semibold tracking-widest uppercase text-[#a3a3a3] block">
                   Tipo de Projeto *
                 </label>
                 <div className="relative w-full">
-                  <select
-                    id="contato-tipo"
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                    className="w-full bg-[#111518] border border-white/15 p-4 pr-10 text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base cursor-pointer"
+                  <button
+                    type="button"
+                    aria-labelledby="contato-tipo-label"
+                    aria-haspopup="listbox"
+                    aria-expanded={isDropdownOpen}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full bg-[#111518] border border-white/15 p-4 text-left text-white focus:outline-none focus:border-[#c8baab] transition-colors text-base cursor-pointer flex items-center justify-between"
                   >
-                    <option value="Construção Residencial">Construção Residencial</option>
-                    <option value="Projeto Comercial">Projeto Comercial</option>
-                    <option value="Reforma ou Ampliação">Reforma ou Ampliação</option>
-                    <option value="Projetos Complementares / Estrutural">Projetos Complementares / Estrutural</option>
-                    <option value="Regularização ou Acompanhamento">Regularização ou Acompanhamento</option>
-                  </select>
+                    <span className="truncate pr-3">{tipo}</span>
+                    <ChevronDownIcon className={`w-4 h-4 text-neutral-400 shrink-0 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-white' : ''}`} />
+                  </button>
+
+                  {isDropdownOpen && (
+                    <ul
+                      role="listbox"
+                      className="absolute z-20 top-full left-0 w-full mt-1 bg-[#161a1f] border border-white/20 shadow-2xl py-1"
+                    >
+                      {PROJECT_OPTIONS.map((opt) => (
+                        <li
+                          key={opt}
+                          role="option"
+                          aria-selected={tipo === opt}
+                          onClick={() => {
+                            setTipo(opt);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`px-4 py-3 text-sm cursor-pointer transition-colors flex items-center justify-between ${
+                            tipo === opt
+                              ? 'bg-white/10 text-white font-medium'
+                              : 'text-neutral-300 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          <span>{opt}</span>
+                          {tipo === opt && (
+                            <span className="text-[#c8baab] text-xs uppercase tracking-wider font-semibold">✓</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 
@@ -180,7 +231,7 @@ export default function ContactPage() {
                 type="submit"
                 className="w-full bg-[#c8baab] text-[#171717] py-4 px-6 sm:px-8 text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer text-center block"
               >
-                <span className="sm:hidden">Continuar no WhatsApp →</span>
+                <span className="sm:hidden">Abrir WhatsApp →</span>
                 <span className="hidden sm:inline">Enviar e Iniciar Conversa no WhatsApp →</span>
               </button>
 
