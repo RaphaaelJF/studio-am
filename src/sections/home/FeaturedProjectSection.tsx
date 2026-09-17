@@ -8,10 +8,10 @@ export function FeaturedProjectSection() {
         {/* Cabeçalho da seção */}
         <div className="mb-12 md:mb-16 text-left">
           <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-3">
-            Caso de Estudo
+            Estudo Conceitual
           </p>
           <h2 className="text-3xl md:text-5xl font-medium text-neutral-900 tracking-tight">
-            Casa Andreia e Marco
+            Projetar considerando o terreno
           </h2>
         </div>
 
@@ -22,7 +22,7 @@ export function FeaturedProjectSection() {
             <div className="w-full bg-transparent overflow-hidden">
               <Image
                 src="/images/concepts/aproveitamento-desnivel.png"
-                alt="Ilustração em corte de uma residência em terreno inclinado, com aproveitamento do pavimento inferior."
+                alt="Ilustração conceitual demonstrando possibilidade de aproveitamento de terreno em declive."
                 width={1024}
                 height={768}
                 sizes="(max-width: 1024px) 100vw, 55vw"
@@ -30,54 +30,44 @@ export function FeaturedProjectSection() {
               />
             </div>
             <figcaption className="mt-4 text-sm text-neutral-600 font-normal leading-relaxed">
-              Ilustração conceitual do aproveitamento do desnível. Não representa o projeto original.
+              Ilustração conceitual criada para demonstrar uma possibilidade de aproveitamento de terreno em declive. Não representa projeto executado pelo Studio AM.
             </figcaption>
           </figure>
 
-          {/* Coluna Direita: Narrativa Técnica (~45%) */}
+          {/* Coluna Direita: Narrativa Conceitual (~45%) */}
           <div className="lg:col-span-5 flex flex-col justify-start border-l-2 border-black/15 pl-6 md:pl-8 py-1">
             <h3 className="text-2xl md:text-[28px] font-medium mb-8 text-neutral-900 leading-snug">
               Transformando um custo estrutural em oportunidade arquitetônica.
             </h3>
 
-            {/* Contexto, Desafio e Decisão dispostos verticalmente */}
-            <div className="space-y-6 mb-8">
+            {/* Contexto, Desafio e Estratégia */}
+            <div className="space-y-6">
               <div>
                 <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
-                  <span className="w-3 h-px bg-neutral-500"></span> O Contexto
+                  <span className="w-3 h-px bg-neutral-500"></span> Contexto
                 </h4>
                 <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
-                  Residência em terreno com acentuada declividade. O projeto pedia aproveitamento inteligente das condições naturais.
+                  Terrenos com declive acentuado exigem atenção especial à implantação, estrutura e aproveitamento dos níveis.
                 </p>
               </div>
 
               <div>
                 <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
-                  <span className="w-3 h-px bg-neutral-500"></span> O Desafio
+                  <span className="w-3 h-px bg-neutral-500"></span> Desafio
                 </h4>
                 <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
-                  As fundações e estruturas necessárias para nivelar uma residência de um pavimento teriam custo próximo ao cenário com aproveitamento do desnível.
+                  Buscar uma solução que reduza intervenções desnecessárias no terreno e transforme o desnível em oportunidade arquitetônica.
                 </p>
               </div>
 
               <div>
                 <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2 flex items-center gap-2">
-                  <span className="w-3 h-px bg-neutral-500"></span> A Decisão
+                  <span className="w-3 h-px bg-neutral-500"></span> Estratégia
                 </h4>
                 <p className="text-base md:text-[18px] text-neutral-700 font-normal leading-relaxed">
-                  Avaliar a criação de um subsolo, aproveitando o investimento estrutural mandatório e convertendo-o em espaço habitável.
+                  Considerar desde o início a integração entre arquitetura, estrutura e implantação, utilizando os diferentes níveis de forma funcional.
                 </p>
               </div>
-            </div>
-
-            {/* O Resultado */}
-            <div className="bg-warm-white p-6 md:p-8 border border-light-gray shadow-sm">
-              <h4 className="text-xs font-semibold tracking-widest uppercase text-neutral-900 mb-2">
-                O Resultado
-              </h4>
-              <p className="text-base md:text-[17px] font-medium text-neutral-900 leading-relaxed">
-                O aproveitamento do desnível transformou uma condicionante do terreno em uma oportunidade para ampliar o uso da residência e integrar melhor arquitetura, estrutura e implantação.
-              </p>
             </div>
           </div>
         </div>
