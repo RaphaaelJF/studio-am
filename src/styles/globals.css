@@ -44,6 +44,10 @@
 }
 
 @layer base {
+  html {
+    scroll-padding-top: 6rem; /* 96px — compensa a altura do Header sticky (72-88px) com margem de respiro */
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

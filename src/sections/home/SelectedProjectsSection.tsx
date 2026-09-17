@@ -9,16 +9,16 @@ export async function SelectedProjectsSection() {
   const [project1, project2, project3] = projects;
 
   return (
-    <section id="projetos" className="scroll-mt-24 md:scroll-mt-28 py-20 md:py-32 px-6 md:px-12 bg-warm-white border-t border-light-gray">
+    <section id="projetos" className="scroll-mt-24 md:scroll-mt-28 pt-16 md:pt-24 pb-16 md:pb-20 px-6 md:px-12 bg-warm-white border-t border-light-gray">
       <div className="max-w-[1400px] mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 border-b border-light-gray pb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-14 gap-8 border-b border-light-gray pb-6">
           <h2 className="text-3xl md:text-5xl font-medium text-neutral-900 tracking-tight">Projetos Selecionados.</h2>
           <Link href="/projetos" className="inline-flex items-center text-xs font-semibold tracking-widest uppercase text-neutral-600 hover:text-neutral-900 transition-colors mb-2">
             Ver portfólio completo <MoveRightIcon className="ml-2 w-3 h-3" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12 lg:gap-x-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-12 md:gap-x-12 lg:gap-x-16">
           {/* Projeto 1 */}
           {project1 && (
             <Link
@@ -52,7 +52,7 @@ export async function SelectedProjectsSection() {
           {project2 && (
             <Link
               href={`/projetos/${project2.slug}`}
-              className="col-span-1 md:col-span-5 md:mt-24 group block"
+              className="col-span-1 md:col-span-5 md:mt-12 group block"
             >
               <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-light-gray">
                 <Image
