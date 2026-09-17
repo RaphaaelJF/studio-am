@@ -5,9 +5,19 @@ import Link from 'next/link';
 export function StudioIntroSection() {
   return (
     <section id="sobre" className="scroll-mt-24 md:scroll-mt-28 py-20 md:py-32 px-6 md:px-12 bg-beige">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-        {/* Retrato Profissional Anne Martins */}
-        <div className="relative aspect-[4/5] w-full max-w-md mx-auto lg:mx-0 order-2 lg:order-1 bg-warm-white border border-light-gray p-3 shadow-sm">
+      <div className="max-w-6xl mx-auto flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+        {/* Cabeçalho "Sobre o Studio AM / Anne Martins" — visível apenas no mobile para ficar acima da foto */}
+        <div className="lg:hidden w-full text-left">
+          <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2">
+            Sobre o Studio AM
+          </p>
+          <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-neutral-900">
+            Anne Martins
+          </h2>
+        </div>
+
+        {/* Retrato Profissional Anne Martins — no mobile fica logo após o título; no desktop fica na coluna 1 (lg:order-1) */}
+        <div className="relative aspect-[4/5] w-full max-w-md mx-auto lg:mx-0 lg:order-1 bg-warm-white border border-light-gray p-3 shadow-sm">
           <div className="w-full h-full relative overflow-hidden bg-light-gray">
             <Image
               src="/images/anne/anne-martins.webp"
@@ -19,9 +29,10 @@ export function StudioIntroSection() {
           </div>
         </div>
 
-        {/* Informações Institucionais e Profissionais */}
-        <div className="order-1 lg:order-2">
-          <div className="mb-6">
+        {/* Informações Institucionais e Profissionais — no desktop fica na coluna 2 (lg:order-2); no mobile vem após a foto */}
+        <div className="w-full lg:order-2">
+          {/* Cabeçalho visível apenas no desktop */}
+          <div className="hidden lg:block mb-6">
             <p className="text-xs font-semibold tracking-widest uppercase text-neutral-500 mb-2">
               Sobre o Studio AM
             </p>
@@ -30,7 +41,7 @@ export function StudioIntroSection() {
             </h2>
           </div>
 
-          <div className="space-y-6 text-neutral-700 text-base md:text-[17px] font-normal leading-relaxed mb-12">
+          <div className="space-y-6 text-neutral-700 text-base md:text-[17px] font-normal leading-relaxed mb-10 md:mb-12">
             <p>
               A Studio AM desenvolve projetos residenciais e comerciais personalizados, conectando arquitetura, engenharia e viabilidade construtiva. Cada solução nasce da escuta cuidadosa da rotina, das necessidades e dos recursos de quem vai viver ou trabalhar no espaço.
             </p>

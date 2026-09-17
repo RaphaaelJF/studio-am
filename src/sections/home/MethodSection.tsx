@@ -179,25 +179,25 @@ export function MethodSection() {
           </p>
         </div>
 
-        {/* Grid dos Passos */}
-        <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+        {/* Grid dos Passos — compactado ~15-20% no mobile */}
+        <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 list-none">
           {steps.map((step) => (
             <li
               key={step.number}
-              className="bg-white p-8 rounded-[1.75rem] border border-[#EFECE6] relative group hover:border-[#8C7A6B] transition-all duration-300 shadow-sm hover:shadow-md"
+              className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[1.75rem] border border-[#EFECE6] relative group hover:border-[#8C7A6B] transition-all duration-300 shadow-sm hover:shadow-md"
             >
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex h-[84px] w-[84px] shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-105">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <div className="flex h-[72px] w-[72px] sm:h-[84px] sm:w-[84px] shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-105">
                   {step.icon}
                 </div>
-                <span className="text-[2.25rem] md:text-[2.6rem] font-light leading-none tracking-[-0.08em] text-[#D3C7B8]">
+                <span className="text-[2rem] sm:text-[2.25rem] md:text-[2.6rem] font-light leading-none tracking-[-0.08em] text-[#D3C7B8]">
                   {step.number}
                 </span>
               </div>
-              <h3 className="text-[2rem] md:text-[2.05rem] font-normal leading-[1.08] tracking-[-0.04em] text-[#1A1A1A] mb-4 max-w-[10.5ch]">
+              <h3 className="text-[1.75rem] sm:text-[2rem] md:text-[2.05rem] font-normal leading-[1.1] sm:leading-[1.08] tracking-[-0.04em] text-[#1A1A1A] mb-3 sm:mb-4 max-w-[10.5ch]">
                 {step.title}
               </h3>
-              <p className="text-[#4A4947] text-[1rem] md:text-[1.05rem] leading-[1.7] tracking-[-0.012em] font-normal">
+              <p className="text-[#4A4947] text-[0.95rem] sm:text-[1rem] md:text-[1.05rem] leading-[1.6] sm:leading-[1.7] tracking-[-0.012em] font-normal">
                 {step.description}
               </p>
             </li>
