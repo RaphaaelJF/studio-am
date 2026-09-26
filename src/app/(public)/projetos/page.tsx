@@ -29,32 +29,36 @@ export default async function ProjectsPage() {
           </h1>
         </header>
 
-        {/* Grade de Projetos */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12 lg:gap-x-16">
-          {projects.map((project, index) => {
-            // Composição variada preservando acabamento editorial
-            const isFirst = index === 0;
+        {/* Grade de Projetos ou Estado Vazio */}
+        {projects.length === 0 ? (
+          <div className="py-20 text-center border-t border-light-gray">
+            <p className="text-lg text-neutral-600 font-normal mb-2">
+              Nenhum projeto publicado no momento.
+            </p>
+            <p className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">
+              Novos projetos e estudos serão disponibilizados em breve.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12 lg:gap-x-16">
+            {projects.map((project, index) => {
+              // Composição variada preservando acabamento editorial
+              const isFirst = index === 0;
 
-            return (
-              <article
-                key={project.slug}
-                className={`col-span-1 ${
-                  isFirst
-                    ? 'md:col-span-12'
-                    : 'md:col-span-6'
-                }`}
+              return (
+                <article
+                  key={project.slug}
+                  className={`col-span-1 ${
+                    isFirst
+                      ? 'md:col-span-12'
+                      : 'md:col-span-6'
+                  }`}
               >
                 <Link
                   href={`/projetos/${project.slug}`}
                   className="group block"
                 >
-                  <div
-                    className={`relative overflow-hidden mb-6 bg-light-gray ${
-                      isFirst
-                        ? 'aspect-[16/9] md:aspect-[21/9]'
-                        : 'aspect-[16/10]'
-                    }`}
-                  >
+                  <div className="relative aspect-[16/9] overflow-hidden mb-6 bg-light-gray">
                     <Image
                       src={project.cover.src}
                       alt={project.cover.alt}
@@ -64,7 +68,7 @@ export default async function ProjectsPage() {
                           ? '(max-width: 768px) 100vw, (max-width: 1400px) 100vw, 1400px'
                           : '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 700px'
                       }
-                      className="object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                      className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                       priority={isFirst}
                     />
                   </div>
@@ -87,6 +91,7 @@ export default async function ProjectsPage() {
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );

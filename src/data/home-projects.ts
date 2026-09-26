@@ -14,13 +14,15 @@ export interface PortfolioProject {
   gallery: ProjectImageItem[];
 }
 
+const STORAGE_BASE = 'https://kzhlligmdddsgleivhrt.supabase.co/storage/v1/object/public/project-images';
+
 export const portfolioProjects: PortfolioProject[] = [
   {
     slug: 'cabana-maria-celia',
     title: 'Cabana Maria Célia',
     category: 'Residencial',
     cover: {
-      src: '/images/projects/cabana-maria-celia/hero.webp',
+      src: `${STORAGE_BASE}/7938e2bf-5606-48b6-abb7-588040ed512f/hero.webp`,
       alt: 'Visualização arquitetônica da fachada e volumetria da Cabana Maria Célia',
       width: 1672,
       height: 941,
@@ -28,28 +30,28 @@ export const portfolioProjects: PortfolioProject[] = [
     },
     gallery: [
       {
-        src: '/images/projects/cabana-maria-celia/hero.webp',
+        src: `${STORAGE_BASE}/7938e2bf-5606-48b6-abb7-588040ed512f/hero.webp`,
         alt: 'Visualização arquitetônica da fachada principal e volumetria em madeira da Cabana Maria Célia',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/cabana-maria-celia/cabana-01.webp',
+        src: `${STORAGE_BASE}/7938e2bf-5606-48b6-abb7-588040ed512f/cabana-01.webp`,
         alt: 'Visualização arquitetônica da vista em perspectiva da Cabana Maria Célia',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/cabana-maria-celia/cabana-03.webp',
+        src: `${STORAGE_BASE}/7938e2bf-5606-48b6-abb7-588040ed512f/cabana-03.webp`,
         alt: 'Visualização arquitetônica dos detalhes de madeira e cobertura da Cabana Maria Célia',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/cabana-maria-celia/cabana-04.webp',
+        src: `${STORAGE_BASE}/7938e2bf-5606-48b6-abb7-588040ed512f/cabana-04.webp`,
         alt: 'Visualização arquitetônica posterior e integração ao terreno da Cabana Maria Célia',
         width: 1672,
         height: 941,
@@ -62,7 +64,7 @@ export const portfolioProjects: PortfolioProject[] = [
     title: 'Residência Débora e William',
     category: 'Residencial',
     cover: {
-      src: '/images/projects/residencia-debora-william/debora-william-02.webp',
+      src: `${STORAGE_BASE}/dd2f9d30-8945-4a8d-8be9-5ea69670a79e/debora-william-02.webp`,
       alt: 'Visualização arquitetônica da fachada principal da Residência Débora e William',
       width: 1280,
       height: 720,
@@ -70,28 +72,28 @@ export const portfolioProjects: PortfolioProject[] = [
     },
     gallery: [
       {
-        src: '/images/projects/residencia-debora-william/debora-william-01.webp',
+        src: `${STORAGE_BASE}/dd2f9d30-8945-4a8d-8be9-5ea69670a79e/debora-william-01.webp`,
         alt: 'Visualização arquitetônica angular da fachada da Residência Débora e William',
         width: 1280,
         height: 720,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/residencia-debora-william/debora-william-02.webp',
+        src: `${STORAGE_BASE}/dd2f9d30-8945-4a8d-8be9-5ea69670a79e/debora-william-02.webp`,
         alt: 'Visualização arquitetônica da fachada frontal e acessos da Residência Débora e William',
         width: 1280,
         height: 720,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/residencia-debora-william/debora-william-03.webp',
+        src: `${STORAGE_BASE}/dd2f9d30-8945-4a8d-8be9-5ea69670a79e/debora-william-03.webp`,
         alt: 'Visualização arquitetônica lateral e garagem da Residência Débora e William',
         width: 1280,
         height: 720,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/residencia-debora-william/debora-william-04.webp',
+        src: `${STORAGE_BASE}/dd2f9d30-8945-4a8d-8be9-5ea69670a79e/debora-william-04.webp`,
         alt: 'Visualização arquitetônica da área de lazer e fundos da Residência Débora e William',
         width: 1280,
         height: 720,
@@ -104,7 +106,7 @@ export const portfolioProjects: PortfolioProject[] = [
     title: 'Quiosque Família Oliveira',
     category: 'Lazer & Convivência',
     cover: {
-      src: '/images/projects/quiosque-familia-oliveira/quiosque-04.webp',
+      src: `${STORAGE_BASE}/3062cd5a-6b2d-4d25-8bcb-bd4a7fbf6c2e/quiosque-04.webp`,
       alt: 'Visualização arquitetônica da fachada e varanda do Quiosque Família Oliveira',
       width: 1672,
       height: 941,
@@ -112,28 +114,28 @@ export const portfolioProjects: PortfolioProject[] = [
     },
     gallery: [
       {
-        src: '/images/projects/quiosque-familia-oliveira/quiosque-02.webp',
+        src: `${STORAGE_BASE}/3062cd5a-6b2d-4d25-8bcb-bd4a7fbf6c2e/quiosque-02.webp`,
         alt: 'Visualização arquitetônica da área de churrasqueira e espaço gourmet do Quiosque Família Oliveira',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/quiosque-familia-oliveira/quiosque-04.webp',
+        src: `${STORAGE_BASE}/3062cd5a-6b2d-4d25-8bcb-bd4a7fbf6c2e/quiosque-04.webp`,
         alt: 'Visualização arquitetônica externa e integração com a natureza do Quiosque Família Oliveira',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/quiosque-familia-oliveira/quiosque-05.webp',
+        src: `${STORAGE_BASE}/3062cd5a-6b2d-4d25-8bcb-bd4a7fbf6c2e/quiosque-05.webp`,
         alt: 'Visualização arquitetônica da perspectiva angular do Quiosque Família Oliveira',
         width: 1672,
         height: 941,
         type: 'visualizacao-arquitetonica',
       },
       {
-        src: '/images/projects/quiosque-familia-oliveira/quiosque-06.webp',
+        src: `${STORAGE_BASE}/3062cd5a-6b2d-4d25-8bcb-bd4a7fbf6c2e/quiosque-06.webp`,
         alt: 'Visualização arquitetônica dos detalhes construtivos e esquadrias do Quiosque Família Oliveira',
         width: 1672,
         height: 941,

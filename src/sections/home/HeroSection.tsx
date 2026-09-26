@@ -87,7 +87,7 @@ export function HeroSection() {
           <div className="hidden lg:block absolute inset-y-0 left-0 w-24 xl:w-32 bg-gradient-to-r from-warm-white to-transparent z-10 pointer-events-none"></div>
 
           <Image
-            src="/images/projects/cabana-maria-celia/hero.webp"
+            src="/images/hero/hero-cabana.webp"
             alt="Visualização arquitetônica da Cabana Maria Célia"
             fill
             priority

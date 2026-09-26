@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getPublishedProjectBySlug } from '@/lib/projects-public';
-import { portfolioProjects } from '@/data/home-projects';
 import { ArrowLeftIcon, MoveRightIcon } from '@/components/shared/Icons';
 import { ProjectGallery } from '@/components/shared/ProjectGallery';
 
@@ -12,15 +11,10 @@ interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Revalida detalhes a cada 60s; slugs novos publicados após o build
-// são gerados sob demanda (dynamicParams padrão).
+// Revalida detalhes a cada 60s (ISR). Slugs publicados são gerados sob demanda
+// diretamente do Supabase e servidos com cache de alta performance.
 export const revalidate = 60
-
-// Usa os dados mock locais para gerar os parâmetros estáticos —
-// evita chamar cookies() fora do contexto de request.
-export async function generateStaticParams() {
-  return portfolioProjects.map((p) => ({ slug: p.slug }));
-}
+export const dynamicParams = true
 
 
 export async function generateMetadata({
