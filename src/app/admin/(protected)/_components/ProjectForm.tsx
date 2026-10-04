@@ -13,7 +13,24 @@ import { ArrowLeftIcon } from '@/components/shared/Icons'
 import { PROJECT_CATEGORIES, slugify, validateProjectForm } from '@/types/admin-project-form'
 import type { ProjectFormData } from '@/types/admin-project-form'
 
-import { createProjectDraft, updateProjectDraft, uploadProjectImages, publishProject, updateProjectImageMeta, setProjectCoverImage } from '@/app/admin/actions/projects'
+import {
+  createProjectDraft,
+  updateProjectDraft,
+  registerUploadedProjectImages,
+  publishProject,
+  updateProjectImageMeta,
+  setProjectCoverImage,
+} from '@/app/admin/actions/projects'
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
+
+function sanitizeFileName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9._-]/g, '-')
+    .replace(/-+/g, '-')
+}
 
 interface ProjectFormProps {
   mode: 'new' | 'edit'
@@ -97,20 +114,51 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
     }
 
     try {
-      // Locais pendentes de upload (com alt/caption/ordem/capa atuais)
       const locals = images.filter(img => img.kind === 'local')
-      const buildUploadForm = () => {
-        const fd = new FormData()
-        locals.forEach(img => {
-          if (img.kind !== 'local') return
-          fd.append('files', img.file)
-        })
-        fd.append('meta', JSON.stringify(locals.map(img => (
-          img.kind === 'local'
-            ? { alt: img.alt, caption: img.caption, is_cover: img.is_cover, display_order: img.display_order }
-            : { alt: '', caption: '', is_cover: false, display_order: 0 }
-        ))))
-        return fd
+
+      // Função que realiza o upload direto do binário para o Supabase Storage via browser
+      const performDirectStorageUpload = async (targetProjectId: string) => {
+        if (locals.length === 0) return { success: true }
+        const supabase = createBrowserClient()
+        const recordsToRegister = []
+
+        for (let i = 0; i < locals.length; i++) {
+          const item = locals[i]
+          if (item.kind !== 'local') continue
+
+          const safeName = sanitizeFileName(item.file.name || `imagem-${i}.webp`)
+          const storagePath = `${targetProjectId}/${Date.now()}-${i}-${safeName}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('project-images')
+            .upload(storagePath, item.file, {
+              upsert: false,
+              contentType: item.file.type || 'image/webp',
+            })
+
+          if (uploadError) {
+            console.error('[ProjectForm:directUpload] Falha no storage:', uploadError.message)
+            return {
+              success: false,
+              error: `Falha ao enviar arquivo ${item.file.name}: ${uploadError.message}`,
+            }
+          }
+
+          recordsToRegister.push({
+            storagePath,
+            alt: item.alt.trim() || item.file.name.replace(/\.[^/.]+$/, ''),
+            caption: item.caption?.trim() || null,
+            is_cover: item.is_cover,
+            display_order: item.display_order,
+          })
+        }
+
+        const regRes = await registerUploadedProjectImages(targetProjectId, recordsToRegister)
+        if (!regRes.success) {
+          return { success: false, error: regRes.error }
+        }
+
+        return { success: true }
       }
 
       if (mode === 'new') {
@@ -126,9 +174,9 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
 
         const newId = res.data.id
         if (locals.length > 0) {
-          const up = await uploadProjectImages(newId, buildUploadForm())
+          const up = await performDirectStorageUpload(newId)
           if (!up.success) {
-            toast(`Projeto criado, mas as imagens falharam: ${up.error}`, 'error')
+            toast(`Projeto criado, mas houve erro no envio das imagens: ${up.error}`, 'error')
             setIsSaving(false)
             router.push(`/admin/projetos/${newId}/editar`)
             return
@@ -169,9 +217,9 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
       }
 
       if (locals.length > 0) {
-        const up = await uploadProjectImages(projectId, buildUploadForm())
+        const up = await performDirectStorageUpload(projectId)
         if (!up.success) {
-          toast(`Texto salvo, mas as imagens falharam: ${up.error}`, 'error')
+          toast(`Texto salvo, mas houve erro no envio das imagens: ${up.error}`, 'error')
           setIsSaving(false)
           return
         }
@@ -227,19 +275,42 @@ export function ProjectForm({ mode, backUrl, isDemo, projectId }: ProjectFormPro
       }
       const locals = images.filter(img => img.kind === 'local')
       if (locals.length > 0) {
-        const fd = new FormData()
-        locals.forEach(img => {
-          if (img.kind !== 'local') return
-          fd.append('files', img.file)
-        })
-        fd.append('meta', JSON.stringify(locals.map(img => (
-          img.kind === 'local'
-            ? { alt: img.alt, caption: img.caption, is_cover: img.is_cover, display_order: img.display_order }
-            : { alt: '', caption: '', is_cover: false, display_order: 0 }
-        ))))
-        const up = await uploadProjectImages(projectId, fd)
-        if (!up.success) {
-          toast(`Não foi possível enviar as imagens: ${up.error}`, 'error')
+        const supabase = createBrowserClient()
+        const recordsToRegister = []
+
+        for (let i = 0; i < locals.length; i++) {
+          const item = locals[i]
+          if (item.kind !== 'local') continue
+
+          const safeName = sanitizeFileName(item.file.name || `imagem-${i}.webp`)
+          const storagePath = `${projectId}/${Date.now()}-${i}-${safeName}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('project-images')
+            .upload(storagePath, item.file, {
+              upsert: false,
+              contentType: item.file.type || 'image/webp',
+            })
+
+          if (uploadError) {
+            console.error('[ProjectForm:handlePublish] Falha no storage:', uploadError.message)
+            toast(`Falha ao enviar arquivo ${item.file.name}: ${uploadError.message}`, 'error')
+            setIsSaving(false)
+            return
+          }
+
+          recordsToRegister.push({
+            storagePath,
+            alt: item.alt.trim() || item.file.name.replace(/\.[^/.]+$/, ''),
+            caption: item.caption?.trim() || null,
+            is_cover: item.is_cover,
+            display_order: item.display_order,
+          })
+        }
+
+        const regRes = await registerUploadedProjectImages(projectId, recordsToRegister)
+        if (!regRes.success) {
+          toast(`Não foi possível registrar as imagens: ${regRes.error}`, 'error')
           setIsSaving(false)
           return
         }

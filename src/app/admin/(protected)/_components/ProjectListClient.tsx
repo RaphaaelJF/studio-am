@@ -12,8 +12,10 @@ import { formatDate, PROJECT_CATEGORIES } from '@/types/admin-project-form'
 import { demoThumbnails } from '../_fixtures/demo-projects'
 import type { DemoId } from '../_fixtures/demo-projects'
 
+import { softDeleteProject, restoreProject, archiveProject, unarchiveProject } from '@/app/admin/actions/projects'
+
 // ─── Types ───────────────────────────────────────────────────────────────────
-type FilterStatus = 'all' | ProjectStatus | 'featured' | 'archived'
+type FilterStatus = 'all' | ProjectStatus | 'featured' | 'archived' | 'deleted'
 type SortKey = 'display_order' | 'updated_at' | 'title'
 
 interface ProjectListClientProps {
@@ -29,12 +31,30 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
   const [sortKey, setSortKey] = useState<SortKey>('display_order')
   const [deleteTarget, setDeleteTarget] = useState<AdminProjectListItem | null>(null)
+  const [archiveTarget, setArchiveTarget] = useState<AdminProjectListItem | null>(null)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const deferredSearch = useDeferredValue(search)
 
   const visibleProjects = useCallback(() => {
     let list = [...projects]
+
+    if (filterStatus === 'deleted') {
+      list = list.filter(p => !!p.deleted_at)
+    } else if (filterStatus === 'archived') {
+      list = list.filter(p => !p.deleted_at && !!p.archived_at)
+    } else {
+      // Nas abas normais (all, published, draft, featured), esconde excluídos e arquivados
+      list = list.filter(p => !p.deleted_at && !p.archived_at)
+
+      if (filterStatus === 'featured') {
+        list = list.filter(p => p.featured)
+      } else if (filterStatus !== 'all') {
+        list = list.filter(p => p.status === filterStatus)
+      }
+    }
+
     if (deferredSearch) {
       const q = deferredSearch.toLowerCase()
       list = list.filter(p =>
@@ -43,13 +63,7 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
         p.category.toLowerCase().includes(q)
       )
     }
-    if (filterStatus === 'archived') {
-      list = []
-    } else if (filterStatus === 'featured') {
-      list = list.filter(p => p.featured)
-    } else if (filterStatus !== 'all') {
-      list = list.filter(p => p.status === filterStatus)
-    }
+
     list.sort((a, b) => {
       if (sortKey === 'display_order') return a.display_order - b.display_order
       if (sortKey === 'updated_at') return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -59,18 +73,102 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
     return list
   }, [projects, deferredSearch, filterStatus, sortKey])
 
-  const handleToggleStatus = (project: AdminProjectListItem) => {
-    const next: ProjectStatus = project.status === 'published' ? 'draft' : 'published'
-    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, status: next } : p))
-    toast(`"${project.title}" → ${next === 'published' ? 'Publicado' : 'Rascunho'}. Não persistido.`, 'info')
-    setOpenMenuId(null)
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    if (isDemo) {
+      setProjects(prev => prev.map(p => p.id === deleteTarget.id ? { ...p, deleted_at: new Date().toISOString() } : p))
+      toast(`"${deleteTarget.title}" movido para Excluídos nesta sessão.`, 'info')
+      setDeleteTarget(null)
+      return
+    }
+
+    setIsProcessing(true)
+    try {
+      const res = await softDeleteProject(deleteTarget.id)
+      if (!res.success) {
+        toast(res.error, 'error')
+        return
+      }
+      setProjects(prev => prev.map(p => p.id === deleteTarget.id ? { ...p, deleted_at: new Date().toISOString(), status: 'draft', featured: false } : p))
+      toast(`"${deleteTarget.title}" movido para Excluídos e removido do site.`, 'success')
+      setDeleteTarget(null)
+    } catch {
+      toast('Erro ao excluir projeto.', 'error')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
-  const handleDelete = () => {
-    if (!deleteTarget) return
-    setProjects(prev => prev.filter(p => p.id !== deleteTarget.id))
-    toast(`"${deleteTarget.title}" removido nesta sessão. Não persistido.`, 'info')
-    setDeleteTarget(null)
+  const handleRestore = async (project: AdminProjectListItem) => {
+    if (isDemo) {
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, deleted_at: null, status: 'draft' } : p))
+      toast(`"${project.title}" restaurado como rascunho na sessão.`, 'success')
+      return
+    }
+
+    setIsProcessing(true)
+    try {
+      const res = await restoreProject(project.id)
+      if (!res.success) {
+        toast(res.error, 'error')
+        return
+      }
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, deleted_at: null, status: 'draft', featured: false } : p))
+      toast(`"${project.title}" restaurado com sucesso como rascunho.`, 'success')
+    } catch {
+      toast('Erro ao restaurar projeto.', 'error')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleArchive = async () => {
+    if (!archiveTarget) return
+    if (isDemo) {
+      setProjects(prev => prev.map(p => p.id === archiveTarget.id ? { ...p, archived_at: new Date().toISOString(), status: 'draft', featured: false } : p))
+      toast(`"${archiveTarget.title}" arquivado na sessão.`, 'info')
+      setArchiveTarget(null)
+      return
+    }
+
+    setIsProcessing(true)
+    try {
+      const res = await archiveProject(archiveTarget.id)
+      if (!res.success) {
+        toast(res.error, 'error')
+        return
+      }
+      setProjects(prev => prev.map(p => p.id === archiveTarget.id ? { ...p, archived_at: new Date().toISOString(), status: 'draft', featured: false } : p))
+      toast(`"${archiveTarget.title}" movido para Arquivados e retirado do site público.`, 'success')
+      setArchiveTarget(null)
+    } catch {
+      toast('Erro ao arquivar projeto.', 'error')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleUnarchive = async (project: AdminProjectListItem) => {
+    if (isDemo) {
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, archived_at: null, status: 'draft' } : p))
+      toast(`"${project.title}" desarquivado como rascunho na sessão.`, 'success')
+      return
+    }
+
+    setIsProcessing(true)
+    try {
+      const res = await unarchiveProject(project.id)
+      if (!res.success) {
+        toast(res.error, 'error')
+        return
+      }
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, archived_at: null, status: 'draft', featured: false } : p))
+      toast(`"${project.title}" desarquivado com sucesso como rascunho.`, 'success')
+    } catch {
+      toast('Erro ao desarquivar projeto.', 'error')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const viewUrl = (p: AdminProjectListItem) =>
@@ -80,15 +178,19 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
   const newProjectHref = isDemo ? '/admin/projetos/novo?visual=demo' : '/admin/projetos/novo'
 
   const visible = visibleProjects()
-  const totalCount = isDemo ? 12 : projects.length
-  const publishedCount = isDemo ? 9 : projects.filter(p => p.status === 'published').length
-  const draftCount = isDemo ? 3 : projects.filter(p => p.status === 'draft').length
+  const activeProjects = projects.filter(p => !p.deleted_at && !p.archived_at)
+  const totalCount = isDemo ? 12 : activeProjects.length
+  const publishedCount = isDemo ? 9 : activeProjects.filter(p => p.status === 'published').length
+  const draftCount = isDemo ? 3 : activeProjects.filter(p => p.status === 'draft').length
+  const archivedCount = projects.filter(p => !p.deleted_at && !!p.archived_at).length
+  const deletedCount = projects.filter(p => !!p.deleted_at).length
 
   const tabs: { id: FilterStatus; label: string; count: number }[] = [
     { id: 'all', label: 'Todos', count: totalCount },
     { id: 'published', label: 'Publicados', count: publishedCount },
     { id: 'draft', label: 'Rascunhos', count: draftCount },
-    { id: 'archived', label: 'Arquivados', count: 0 },
+    { id: 'archived', label: 'Arquivados', count: archivedCount },
+    { id: 'deleted', label: 'Excluídos', count: deletedCount },
   ]
 
   return (
@@ -132,7 +234,8 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
             <option value="all">Status: Todos ({totalCount})</option>
             <option value="published">Status: Publicados ({publishedCount})</option>
             <option value="draft">Status: Rascunhos ({draftCount})</option>
-            <option value="archived">Status: Arquivados (0)</option>
+            <option value="archived">Status: Arquivados ({archivedCount})</option>
+            <option value="deleted">Status: Excluídos ({deletedCount})</option>
           </select>
         </div>
 
@@ -248,7 +351,7 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
                 </thead>
                 <tbody>
                   {visible.map((p, rowIndex) => {
-                    const thumb = p.id in demoThumbnails ? demoThumbnails[p.id as DemoId] : null
+                    const thumb = p.cover_url || (p.id in demoThumbnails ? demoThumbnails[p.id as DemoId] : null)
                     return (
                       <tr
                         key={p.id}
@@ -263,7 +366,7 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-3">
                             <div
-                              className="shrink-0 rounded overflow-hidden"
+                              className="shrink-0 rounded overflow-hidden flex items-center justify-center relative"
                               style={{
                                 width: 48,
                                 height: 36,
@@ -271,9 +374,24 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
                                 border: '1px solid var(--admin-border)',
                               }}
                             >
-                              {thumb && (
+                              {thumb ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={thumb} alt={p.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <svg
+                                  className="w-4 h-4 opacity-40"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  style={{ color: 'var(--admin-muted)' }}
+                                >
+                                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                  <circle cx="9" cy="9" r="2" />
+                                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                </svg>
                               )}
                             </div>
                             <div>
@@ -301,12 +419,22 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
 
                         {/* Status */}
                         <td className="px-5 py-3">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium ${p.status === 'published' ? 'badge-published' : 'badge-draft'
-                              }`}
-                          >
-                            {p.status === 'published' ? 'Publicado' : 'Rascunho'}
-                          </span>
+                          {p.deleted_at ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-red-100 text-red-700">
+                              Excluído
+                            </span>
+                          ) : p.archived_at ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-100 text-amber-800">
+                              Arquivado
+                            </span>
+                          ) : (
+                            <span
+                              className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium ${p.status === 'published' ? 'badge-published' : 'badge-draft'
+                                }`}
+                            >
+                              {p.status === 'published' ? 'Publicado' : 'Rascunho'}
+                            </span>
+                          )}
                         </td>
 
                         {/* Atualizado */}
@@ -317,30 +445,53 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
                         {/* Ações */}
                         <td className="px-5 py-3 text-right">
                           <div className="flex items-center justify-end gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                            <Link
-                              href={viewUrl(p)}
-                              className="p-1.5 rounded-lg transition-colors"
-                              style={{ color: 'var(--admin-muted)' }}
-                              aria-label={`Preview ${p.title}`}
-                            >
-                              <EyeIcon className="w-4 h-4" />
-                            </Link>
-                            <Link
-                              href={editUrl(p)}
-                              className="p-1.5 rounded-lg transition-colors"
-                              style={{ color: 'var(--admin-muted)' }}
-                              aria-label={`Editar ${p.title}`}
-                            >
-                              <EditIcon className="w-4 h-4" />
-                            </Link>
-                            <ActionMenu
-                              project={p}
-                              isOpen={openMenuId === p.id}
-                              onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
-                              onClose={() => setOpenMenuId(null)}
-                              onToggleStatus={() => handleToggleStatus(p)}
-                              onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
-                            />
+                            {p.deleted_at ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRestore(p)}
+                                disabled={isProcessing}
+                                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border hover:bg-gray-50"
+                                style={{ borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }}
+                              >
+                                Restaurar
+                              </button>
+                            ) : p.archived_at ? (
+                              <ActionMenu
+                                project={p}
+                                isOpen={openMenuId === p.id}
+                                onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                                onClose={() => setOpenMenuId(null)}
+                                onUnarchive={() => handleUnarchive(p)}
+                                onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
+                              />
+                            ) : (
+                              <>
+                                <Link
+                                  href={viewUrl(p)}
+                                  className="p-1.5 rounded-lg transition-colors"
+                                  style={{ color: 'var(--admin-muted)' }}
+                                  aria-label={`Preview ${p.title}`}
+                                >
+                                  <EyeIcon className="w-4 h-4" />
+                                </Link>
+                                <Link
+                                  href={editUrl(p)}
+                                  className="p-1.5 rounded-lg transition-colors"
+                                  style={{ color: 'var(--admin-muted)' }}
+                                  aria-label={`Editar ${p.title}`}
+                                >
+                                  <EditIcon className="w-4 h-4" />
+                                </Link>
+                                <ActionMenu
+                                  project={p}
+                                  isOpen={openMenuId === p.id}
+                                  onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                                  onClose={() => setOpenMenuId(null)}
+                                  onArchive={() => { setArchiveTarget(p); setOpenMenuId(null) }}
+                                  onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
+                                />
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -378,17 +529,32 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
             {/* Mobile cards */}
             <div className="md:hidden divide-y" style={{ borderColor: 'var(--admin-border)' }}>
               {visible.map(p => {
-                const thumb = p.id in demoThumbnails ? demoThumbnails[p.id as DemoId] : null
+                const thumb = p.cover_url || (p.id in demoThumbnails ? demoThumbnails[p.id as DemoId] : null)
                 return (
                   <div key={p.id} className="p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <div
-                        className="shrink-0 rounded overflow-hidden"
+                        className="shrink-0 rounded overflow-hidden flex items-center justify-center relative"
                         style={{ width: 56, height: 42, background: 'var(--admin-active)', border: '1px solid var(--admin-border)' }}
                       >
-                        {thumb && (
+                        {thumb ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={thumb} alt={p.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <svg
+                            className="w-4 h-4 opacity-40"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ color: 'var(--admin-muted)' }}
+                          >
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                            <circle cx="9" cy="9" r="2" />
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                          </svg>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -399,39 +565,72 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
                           {PROJECT_CATEGORIES.find(c => c.value === p.category)?.label ?? p.category}
                         </p>
                       </div>
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 ${p.status === 'published' ? 'badge-published' : 'badge-draft'
-                        }`}>
-                        {p.status === 'published' ? 'Publicado' : 'Rascunho'}
-                      </span>
+                      {p.deleted_at ? (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 bg-red-100 text-red-700">
+                          Excluído
+                        </span>
+                      ) : p.archived_at ? (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 bg-amber-100 text-amber-800">
+                          Arquivado
+                        </span>
+                      ) : (
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 ${p.status === 'published' ? 'badge-published' : 'badge-draft'
+                          }`}>
+                          {p.status === 'published' ? 'Publicado' : 'Rascunho'}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between pt-1 text-xs" style={{ color: 'var(--admin-muted)' }}>
                       <span>Atualizado {formatDate(p.updated_at)}</span>
                       <div className="flex items-center gap-2">
-                        <Link
-                          href={viewUrl(p)}
-                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-xs font-medium rounded hover:bg-gray-100 transition-colors"
-                          style={{ color: 'var(--admin-muted)' }}
-                          aria-label={`Visualizar ${p.title}`}
-                        >
-                          Visualizar
-                        </Link>
-                        <Link
-                          href={editUrl(p)}
-                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-xs font-medium rounded hover:bg-gray-100 transition-colors"
-                          style={{ color: 'var(--admin-text)' }}
-                          aria-label={`Editar ${p.title}`}
-                        >
-                          Editar
-                        </Link>
-                        <ActionMenu
-                          project={p}
-                          isOpen={openMenuId === p.id}
-                          onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
-                          onClose={() => setOpenMenuId(null)}
-                          onToggleStatus={() => handleToggleStatus(p)}
-                          onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
-                        />
+                        {p.deleted_at ? (
+                          <button
+                            type="button"
+                            onClick={() => handleRestore(p)}
+                            disabled={isProcessing}
+                            className="min-h-[44px] px-3 inline-flex items-center justify-center text-xs font-medium rounded border hover:bg-gray-50 transition-colors"
+                            style={{ borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }}
+                          >
+                            Restaurar
+                          </button>
+                        ) : p.archived_at ? (
+                          <ActionMenu
+                            project={p}
+                            isOpen={openMenuId === p.id}
+                            onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                            onClose={() => setOpenMenuId(null)}
+                            onUnarchive={() => handleUnarchive(p)}
+                            onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
+                          />
+                        ) : (
+                          <>
+                            <Link
+                              href={viewUrl(p)}
+                              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-xs font-medium rounded hover:bg-gray-100 transition-colors"
+                              style={{ color: 'var(--admin-muted)' }}
+                              aria-label={`Visualizar ${p.title}`}
+                            >
+                              Visualizar
+                            </Link>
+                            <Link
+                              href={editUrl(p)}
+                              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-xs font-medium rounded hover:bg-gray-100 transition-colors"
+                              style={{ color: 'var(--admin-text)' }}
+                              aria-label={`Editar ${p.title}`}
+                            >
+                              Editar
+                            </Link>
+                            <ActionMenu
+                              project={p}
+                              isOpen={openMenuId === p.id}
+                              onToggle={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                              onClose={() => setOpenMenuId(null)}
+                              onArchive={() => { setArchiveTarget(p); setOpenMenuId(null) }}
+                              onDelete={() => { setDeleteTarget(p); setOpenMenuId(null) }}
+                            />
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -442,12 +641,22 @@ export function ProjectListClient({ projects: initialProjects, isDemo }: Project
         )}
       </AdminCard>
 
+      {/* Confirm archive */}
+      <ConfirmDialog
+        open={!!archiveTarget}
+        title="Arquivar projeto"
+        description={`Arquivar "${archiveTarget?.title}"? O projeto sairá das listagens ativas e do site público, ficando acessível na aba "Arquivados".`}
+        confirmLabel="Arquivar projeto"
+        onConfirm={handleArchive}
+        onCancel={() => setArchiveTarget(null)}
+      />
+
       {/* Confirm delete */}
       <ConfirmDialog
         open={!!deleteTarget}
         title="Excluir projeto"
-        description={`Excluir "${deleteTarget?.title}"? Nenhum dado será removido do banco nesta sessão.`}
-        confirmLabel="Excluir"
+        description={`Mover "${deleteTarget?.title}" para Excluídos? O projeto sairá imediatamente do site público e poderá ser restaurado a qualquer momento.`}
+        confirmLabel="Mover para Excluídos"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         destructive
@@ -462,11 +671,12 @@ interface ActionMenuProps {
   isOpen: boolean
   onToggle: () => void
   onClose: () => void
-  onToggleStatus: () => void
+  onArchive?: () => void
+  onUnarchive?: () => void
   onDelete: () => void
 }
 
-function ActionMenu({ project, isOpen, onToggle, onClose, onToggleStatus, onDelete }: ActionMenuProps) {
+function ActionMenu({ project, isOpen, onToggle, onClose, onArchive, onUnarchive, onDelete }: ActionMenuProps) {
   React.useEffect(() => {
     if (!isOpen) return
     const handler = (e: MouseEvent) => {
@@ -476,6 +686,8 @@ function ActionMenu({ project, isOpen, onToggle, onClose, onToggleStatus, onDele
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [isOpen, onClose])
+
+  const isArchived = !!project.archived_at
 
   return (
     <div className="relative" data-action-menu>
@@ -495,15 +707,35 @@ function ActionMenu({ project, isOpen, onToggle, onClose, onToggleStatus, onDele
           style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}
           role="menu"
         >
-          <button
-            type="button"
-            onClick={onToggleStatus}
-            className="w-full text-left px-4 py-2 text-sm transition-colors"
-            style={{ color: 'var(--admin-text)' }}
-            role="menuitem"
-          >
-            {project.status === 'published' ? 'Reverter para rascunho' : 'Publicar (sessão)'}
-          </button>
+          {isArchived ? (
+            <>
+              {onUnarchive && (
+                <button
+                  type="button"
+                  onClick={onUnarchive}
+                  className="w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50"
+                  style={{ color: 'var(--admin-text)' }}
+                  role="menuitem"
+                >
+                  Desarquivar
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {onArchive && (
+                <button
+                  type="button"
+                  onClick={onArchive}
+                  className="w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50"
+                  style={{ color: 'var(--admin-text)' }}
+                  role="menuitem"
+                >
+                  Arquivar
+                </button>
+              )}
+            </>
+          )}
           <div style={{ height: '1px', background: 'var(--admin-border)', margin: '4px 0' }} />
           <button
             type="button"

@@ -40,6 +40,8 @@ export async function generateMetadata({
   };
 }
 
+import { ProjectViewTracker } from '@/components/analytics/ProjectViewTracker';
+
 export default async function ProjectDetailPage({
   params,
 }: ProjectDetailPageProps) {
@@ -52,6 +54,7 @@ export default async function ProjectDetailPage({
 
   return (
     <article className="bg-warm-white min-h-screen py-16 md:py-24 px-6 md:px-12">
+      <ProjectViewTracker projectId={project.id} slug={project.slug} />
       <div className="max-w-[1400px] mx-auto">
         {/* Navegação de Retorno */}
         <nav aria-label="Navegação do Projeto" className="mb-12">

@@ -224,6 +224,28 @@ export async function updateProjectDraft(
 
     const supabase = await createClient()
 
+    // Consulta estado atual para saber status e slug anterior (em caso de renomeação de slug)
+    const { data: previous, error: prevError } = await supabase
+      .from('projects')
+      .select('slug, status')
+      .eq('id', cleanId)
+      .maybeSingle()
+
+    if (prevError) {
+      console.error('[updateProjectDraft] Falha ao verificar estado anterior do projeto:', prevError.message)
+      return {
+        success: false,
+        error: 'Falha ao consultar dados atuais do projeto.',
+      }
+    }
+
+    if (!previous) {
+      return {
+        success: false,
+        error: 'Projeto não encontrado ou você não possui permissão para editá-lo.',
+      }
+    }
+
     // Preserva status/featured/published_at — edição de texto nunca despublica sozinha.
     const { data, error } = await supabase
       .from('projects')
@@ -274,7 +296,141 @@ export async function updateProjectDraft(
   }
 }
 
-// ─── Upload real de imagens ─────────────────────────────────────────────
+export interface UploadedImageRecordInput {
+  storagePath: string
+  alt: string
+  caption?: string | null
+  is_cover: boolean
+  display_order?: number
+}
+
+/**
+ * Registra no banco de dados os metadados de imagens cujo upload binário foi
+ * realizado diretamente pelo navegador para o Supabase Storage.
+ * Garante RLS, unicidade de capa e revalidação de caminhos no Next.js.
+ */
+export async function registerUploadedProjectImages(
+  projectId: string,
+  records: UploadedImageRecordInput[],
+): Promise<ActionResponse<{ registered: number }>> {
+  try {
+    await requireAdminProfile()
+
+    if (!projectId || !UUID_REGEX.test(projectId.trim())) {
+      return { success: false, error: 'Identificador de projeto inválido.' }
+    }
+    const cleanId = projectId.trim()
+    if (!Array.isArray(records) || records.length === 0) {
+      return { success: false, error: 'Nenhum registro de imagem fornecido.' }
+    }
+
+    const supabase = await createClient()
+
+    // 1. Consulta se o projeto existe
+    const { data: project, error: projErr } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('id', cleanId)
+      .maybeSingle()
+
+    if (projErr || !project) {
+      return { success: false, error: 'Projeto não encontrado.' }
+    }
+
+    // 2. Consulta ordem base (maior display_order atual)
+    const { data: existing } = await supabase
+      .from('project_images')
+      .select('display_order, is_cover')
+      .eq('project_id', cleanId)
+      .order('display_order', { ascending: false })
+      .limit(1)
+
+    const baseOrder = existing?.[0]?.display_order != null ? Number(existing[0].display_order) + 1 : 0
+
+    let registered = 0
+    const errors: string[] = []
+
+    for (let i = 0; i < records.length; i++) {
+      const rec = records[i]
+      const cleanPath = (rec.storagePath ?? '').trim()
+      const alt = (rec.alt ?? '').trim()
+
+      if (!cleanPath) {
+        errors.push(`Imagem ${i + 1}: caminho no storage ausente.`)
+        continue
+      }
+      if (!alt) {
+        errors.push(`Imagem ${i + 1}: texto alternativo (alt) é obrigatório.`)
+        continue
+      }
+
+      // Se esta imagem for marcada como capa, remove a marcação de capa anterior
+      if (rec.is_cover) {
+        await supabase
+          .from('project_images')
+          .update({ is_cover: false })
+          .eq('project_id', cleanId)
+          .eq('is_cover', true)
+      }
+
+      const displayOrder = Number.isFinite(rec.display_order)
+        ? Math.max(0, Math.floor(rec.display_order!))
+        : baseOrder + i
+
+      const { error: insertErr } = await supabase.from('project_images').insert({
+        project_id: cleanId,
+        storage_path: cleanPath,
+        alt,
+        caption: (rec.caption ?? '').trim() || null,
+        display_order: displayOrder,
+        is_cover: !!rec.is_cover,
+      })
+
+      if (insertErr) {
+        console.error('[registerUploadedProjectImages] erro ao inserir:', insertErr.message)
+        errors.push(`Falha ao registrar imagem: ${insertErr.message}`)
+        continue
+      }
+
+      registered++
+    }
+
+    // 3. Garante que exista exatamente uma capa se há imagens no projeto
+    const { data: covers } = await supabase
+      .from('project_images')
+      .select('id')
+      .eq('project_id', cleanId)
+      .eq('is_cover', true)
+      .limit(1)
+
+    if (!covers || covers.length === 0) {
+      const { data: first } = await supabase
+        .from('project_images')
+        .select('id')
+        .eq('project_id', cleanId)
+        .order('display_order', { ascending: true })
+        .limit(1)
+      if (first?.[0]?.id) {
+        await supabase.from('project_images').update({ is_cover: true }).eq('id', first[0].id)
+      }
+    }
+
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
+    revalidatePath('/admin/projetos')
+
+    if (registered === 0) {
+      return { success: false, error: errors.join(' ') || 'Nenhuma imagem foi registrada.' }
+    }
+
+    return { success: true, data: { registered } }
+  } catch (err) {
+    console.error('[registerUploadedProjectImages] inesperado:', err)
+    return { success: false, error: 'Erro de autenticação ou falha interna.' }
+  }
+}
+
+// ─── Upload real de imagens (compatibilidade legada) ───────────────────
 // Recebe FormData com: projectId (string), files (File[]), meta (JSON de ImageMetaInput[])
 export async function uploadProjectImages(
   projectId: string,
@@ -418,15 +574,13 @@ export async function uploadProjectImages(
     }
 
     revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
     revalidatePath('/admin/projetos')
-    revalidatePath('/projetos')
-    revalidatePath('/')
 
     if (uploaded === 0) {
       return { success: false, error: errors.join(' ') || 'Nenhuma imagem foi enviada.' }
     }
     if (errors.length > 0) {
-      // Upload parcial: informa mas retorna sucesso com ressalva no erro? Mantém sucesso.
       console.warn('[uploadProjectImages] parcial:', errors.join(' '))
     }
     return { success: true, data: { uploaded } }
@@ -455,14 +609,28 @@ export async function deleteProjectImage(imageId: string): Promise<ActionRespons
     const storagePath = (img as { storage_path: string }).storage_path
     const wasCover = (img as { is_cover: boolean }).is_cover
 
+    // Remove do banco de rascunho (project_images)
     const { error: dbError } = await supabase.from('project_images').delete().eq('id', imageId.trim())
     if (dbError) {
-      return { success: false, error: 'Não foi possível remover a imagem.' }
+      return { success: false, error: 'Não foi possível remover a imagem do rascunho.' }
     }
+
+    // REGRA DE SEGURANÇA: Não apagar o arquivo físico do Storage se ele estiver sendo utilizado
+    // pela publicação pública ativa (project_publication_images)
     if (storagePath && !storagePath.startsWith('http')) {
-      await supabase.storage.from('project-images').remove([storagePath.replace(/^project-images\//, '')])
+      const cleanPath = storagePath.replace(/^project-images\//, '')
+      const { data: pubInUse } = await supabase
+        .from('project_publication_images')
+        .select('id')
+        .eq('storage_path', storagePath)
+        .limit(1)
+
+      if (!pubInUse || pubInUse.length === 0) {
+        await supabase.storage.from('project-images').remove([cleanPath])
+      }
     }
-    // Se era capa, promove a primeira restante
+
+    // Se era capa no rascunho, promove a primeira restante no rascunho
     if (wasCover) {
       const { data: first } = await supabase
         .from('project_images')
@@ -476,9 +644,9 @@ export async function deleteProjectImage(imageId: string): Promise<ActionRespons
     }
 
     revalidatePath(`/admin/projetos/${projectId}/editar`)
+    revalidatePath(`/admin/projetos/${projectId}/preview`)
     revalidatePath('/admin/projetos')
-    revalidatePath('/projetos')
-    revalidatePath('/')
+
     return { success: true, data: null }
   } catch (err) {
     console.error('[deleteProjectImage] inesperado:', err)
@@ -507,8 +675,25 @@ export async function updateProjectImageMeta(
     if (Object.keys(payload).length === 0) return { success: true, data: null }
 
     const supabase = await createClient()
+
+    // Busca project_id da imagem
+    const { data: img, error: imgErr } = await supabase
+      .from('project_images')
+      .select('project_id')
+      .eq('id', imageId.trim())
+      .maybeSingle()
+
+    if (imgErr || !img) {
+      console.error('[updateProjectImageMeta] Imagem não encontrada:', imgErr?.message)
+      return { success: false, error: 'Imagem não encontrada para atualização.' }
+    }
+
     const { error } = await supabase.from('project_images').update(payload).eq('id', imageId.trim())
     if (error) return { success: false, error: 'Não foi possível atualizar a imagem.' }
+
+    revalidatePath(`/admin/projetos/${img.project_id}/editar`)
+    revalidatePath(`/admin/projetos/${img.project_id}/preview`)
+
     return { success: true, data: null }
   } catch (err) {
     console.error('[updateProjectImageMeta] inesperado:', err)
@@ -525,15 +710,25 @@ export async function setProjectCoverImage(
     if (!UUID_REGEX.test(projectId.trim()) || !UUID_REGEX.test(imageId.trim())) {
       return { success: false, error: 'Identificadores inválidos.' }
     }
+    const cleanProjectId = projectId.trim()
+    const cleanImageId = imageId.trim()
     const supabase = await createClient()
-    await supabase.from('project_images').update({ is_cover: false }).eq('project_id', projectId.trim()).eq('is_cover', true)
-    const { error } = await supabase
-      .from('project_images')
-      .update({ is_cover: true })
-      .eq('id', imageId.trim())
-      .eq('project_id', projectId.trim())
-    if (error) return { success: false, error: 'Não foi possível definir a capa.' }
-    revalidatePath(`/admin/projetos/${projectId.trim()}/editar`)
+
+    // Executa a troca de capa atômica no banco de dados via RPC transacional apenas no rascunho
+    const { error: rpcError } = await supabase.rpc('set_project_cover_image_atomic', {
+      p_project_id: cleanProjectId,
+      p_image_id: cleanImageId,
+    })
+
+    if (rpcError) {
+      console.error('[setProjectCoverImage] Falha na operação atômica de troca de capa:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível definir a nova capa.' }
+    }
+
+    revalidatePath(`/admin/projetos/${cleanProjectId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanProjectId}/preview`)
+    revalidatePath('/admin/projetos')
+
     return { success: true, data: null }
   } catch (err) {
     console.error('[setProjectCoverImage] inesperado:', err)
@@ -541,7 +736,7 @@ export async function setProjectCoverImage(
   }
 }
 
-// ─── Publicação real ────────────────────────────────────────────────
+// ─── Publicação real atômica ──────────────────────────────────────────
 export async function publishProject(
   projectId: string,
   opts?: { featured?: boolean; display_order?: number },
@@ -554,60 +749,49 @@ export async function publishProject(
     const cleanId = projectId.trim()
     const supabase = await createClient()
 
-    // Valida requisitos no servidor (não confia só no client)
-    const { data: project, error: projError } = await supabase
-      .from('projects')
-      .select('id, title, slug, category, summary, description')
-      .eq('id', cleanId)
-      .maybeSingle()
-    if (projError || !project) {
-      return { success: false, error: 'Projeto não encontrado.' }
-    }
-    const p = project as { title: string; slug: string; category: string; summary: string | null; description: string | null }
-    if (!p.title?.trim() || !p.slug?.trim() || !p.category?.trim()) {
-      return { success: false, error: 'Título, slug e categoria são obrigatórios.' }
-    }
-    if (!p.summary?.trim() || !p.description?.trim()) {
-      return { success: false, error: 'Resumo e descrição são obrigatórios para publicação.' }
-    }
-    const { data: images, error: imgError } = await supabase
-      .from('project_images')
-      .select('id, alt, is_cover')
+    // 1. Consulta slug atualmente publicado (se já houver publicação ativa)
+    const { data: currentPub } = await supabase
+      .from('project_publications')
+      .select('slug')
       .eq('project_id', cleanId)
-    if (imgError) {
-      return { success: false, error: 'Não foi possível validar as imagens.' }
-    }
-    if (!images || images.length === 0) {
-      return { success: false, error: 'Adicione ao menos uma imagem antes de publicar.' }
-    }
-    const cover = (images as { alt: string; is_cover: boolean }[]).find((i) => i.is_cover)
-    if (!cover) {
-      return { success: false, error: 'Defina uma imagem de capa antes de publicar.' }
-    }
-    if (!cover.alt?.trim()) {
-      return { success: false, error: 'O texto alternativo da capa é obrigatório.' }
+      .maybeSingle()
+
+    // 2. Executa a transação atômica de publicação no banco via RPC
+    const { data: pubId, error: rpcError } = await supabase.rpc('publish_project_atomic', {
+      p_project_id: cleanId,
+      p_featured: opts?.featured !== undefined ? !!opts.featured : null,
+      p_display_order: opts?.display_order !== undefined && Number.isFinite(opts.display_order)
+        ? Math.max(0, Math.floor(opts.display_order))
+        : null,
+    })
+
+    if (rpcError) {
+      console.error('[publishProject] Falha na RPC publish_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível publicar o projeto.' }
     }
 
-    const payload: Record<string, unknown> = {
-      status: 'published',
-      published_at: new Date().toISOString(),
-    }
-    if (opts?.featured !== undefined) payload.featured = !!opts.featured
-    if (opts?.display_order !== undefined && Number.isFinite(opts.display_order)) {
-      payload.display_order = Math.max(0, Math.floor(opts.display_order))
-    }
+    // 3. Consulta o slug que acabou de ser publicado
+    const { data: newPub } = await supabase
+      .from('project_publications')
+      .select('slug')
+      .eq('id', pubId)
+      .maybeSingle()
 
-    const { error: updateError } = await supabase.from('projects').update(payload).eq('id', cleanId)
-    if (updateError) {
-      console.error('[publishProject] update error:', updateError.message)
-      return { success: false, error: 'Não foi possível publicar o projeto.' }
-    }
-
+    // 4. Somente após a publicação bem-sucedida, executa revalidatePath
     revalidatePath('/')
     revalidatePath('/projetos')
+    if (currentPub?.slug) {
+      revalidatePath(`/projetos/${currentPub.slug}`)
+    }
+    if (newPub?.slug && newPub.slug !== currentPub?.slug) {
+      revalidatePath(`/projetos/${newPub.slug}`)
+    }
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
     revalidatePath('/admin/projetos')
     revalidatePath('/admin')
     revalidatePath('/admin/dashboard')
+
     return { success: true, data: { id: cleanId } }
   } catch (err) {
     console.error('[publishProject] inesperado:', err)
@@ -623,17 +807,264 @@ export async function unpublishProject(projectId: string): Promise<ActionRespons
     }
     const cleanId = projectId.trim()
     const supabase = await createClient()
-    const { error } = await supabase
-      .from('projects')
-      .update({ status: 'draft', featured: false })
-      .eq('id', cleanId)
-    if (error) return { success: false, error: 'Não foi possível despublicar.' }
+
+    // 1. Consulta slug antes de despublicar para invalidar a rota pública
+    const { data: currentPub } = await supabase
+      .from('project_publications')
+      .select('slug')
+      .eq('project_id', cleanId)
+      .maybeSingle()
+
+    // 2. Executa a despublicação atômica no banco via RPC
+    const { error: rpcError } = await supabase.rpc('unpublish_project_atomic', {
+      p_project_id: cleanId,
+    })
+
+    if (rpcError) {
+      console.error('[unpublishProject] Falha na RPC unpublish_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível despublicar o projeto.' }
+    }
+
+    // 3. Revalida rotas públicas afetadas
     revalidatePath('/')
     revalidatePath('/projetos')
+    if (currentPub?.slug) {
+      revalidatePath(`/projetos/${currentPub.slug}`)
+    }
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
     revalidatePath('/admin/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+
     return { success: true, data: { id: cleanId } }
   } catch (err) {
     console.error('[unpublishProject] inesperado:', err)
     return { success: false, error: 'Erro interno.' }
   }
 }
+
+export async function softDeleteProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
+  try {
+    await requireAdminProfile()
+    if (!projectId || !UUID_REGEX.test(projectId.trim())) {
+      return { success: false, error: 'Identificador de projeto inválido.' }
+    }
+    const cleanId = projectId.trim()
+    const supabase = await createClient()
+
+    // 1. Consulta slug antes de excluir para invalidar rota pública
+    const { data: currentPub } = await supabase
+      .from('project_publications')
+      .select('slug')
+      .eq('project_id', cleanId)
+      .maybeSingle()
+
+    // 2. Executa a exclusão lógica atômica via RPC
+    const { error: rpcError } = await supabase.rpc('soft_delete_project_atomic', {
+      p_project_id: cleanId,
+    })
+
+    if (rpcError) {
+      console.error('[softDeleteProject] Falha na RPC soft_delete_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível excluir o projeto.' }
+    }
+
+    // 3. Revalida rotas públicas e administrativas
+    revalidatePath('/')
+    revalidatePath('/projetos')
+    if (currentPub?.slug) {
+      revalidatePath(`/projetos/${currentPub.slug}`)
+    }
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
+    revalidatePath('/admin/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+
+    return { success: true, data: { id: cleanId } }
+  } catch (err) {
+    console.error('[softDeleteProject] inesperado:', err)
+    return { success: false, error: 'Erro interno ao excluir projeto.' }
+  }
+}
+
+export async function restoreProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
+  try {
+    await requireAdminProfile()
+    if (!projectId || !UUID_REGEX.test(projectId.trim())) {
+      return { success: false, error: 'Identificador de projeto inválido.' }
+    }
+    const cleanId = projectId.trim()
+    const supabase = await createClient()
+
+    // 1. Executa a restauração atômica via RPC
+    const { error: rpcError } = await supabase.rpc('restore_project_atomic', {
+      p_project_id: cleanId,
+    })
+
+    if (rpcError) {
+      console.error('[restoreProject] Falha na RPC restore_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível restaurar o projeto.' }
+    }
+
+    // 2. Revalida rotas administrativas (o projeto volta como rascunho, NÃO publicado)
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
+    revalidatePath('/admin/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+
+    return { success: true, data: { id: cleanId } }
+  } catch (err) {
+    console.error('[restoreProject] inesperado:', err)
+    return { success: false, error: 'Erro interno ao restaurar projeto.' }
+  }
+}
+
+export async function archiveProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
+  try {
+    await requireAdminProfile()
+    if (!projectId || !UUID_REGEX.test(projectId.trim())) {
+      return { success: false, error: 'Identificador de projeto inválido.' }
+    }
+    const cleanId = projectId.trim()
+    const supabase = await createClient()
+
+    // 1. Consulta slug antes de arquivar para invalidar rota pública
+    const { data: currentPub } = await supabase
+      .from('project_publications')
+      .select('slug')
+      .eq('project_id', cleanId)
+      .maybeSingle()
+
+    // 2. Executa arquivamento atômico via RPC
+    const { error: rpcError } = await supabase.rpc('archive_project_atomic', {
+      p_project_id: cleanId,
+    })
+
+    if (rpcError) {
+      console.error('[archiveProject] Falha na RPC archive_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível arquivar o projeto.' }
+    }
+
+    // 3. Revalida rotas públicas e administrativas
+    revalidatePath('/')
+    revalidatePath('/projetos')
+    if (currentPub?.slug) {
+      revalidatePath(`/projetos/${currentPub.slug}`)
+    }
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
+    revalidatePath('/admin/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+
+    return { success: true, data: { id: cleanId } }
+  } catch (err) {
+    console.error('[archiveProject] inesperado:', err)
+    return { success: false, error: 'Erro interno ao arquivar projeto.' }
+  }
+}
+
+export async function unarchiveProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
+  try {
+    await requireAdminProfile()
+    if (!projectId || !UUID_REGEX.test(projectId.trim())) {
+      return { success: false, error: 'Identificador de projeto inválido.' }
+    }
+    const cleanId = projectId.trim()
+    const supabase = await createClient()
+
+    // 1. Executa desarquivamento atômico via RPC (volta como draft, não republicado)
+    const { error: rpcError } = await supabase.rpc('unarchive_project_atomic', {
+      p_project_id: cleanId,
+    })
+
+    if (rpcError) {
+      console.error('[unarchiveProject] Falha na RPC unarchive_project_atomic:', rpcError.message)
+      return { success: false, error: rpcError.message || 'Não foi possível desarquivar o projeto.' }
+    }
+
+    // 2. Revalida rotas administrativas
+    revalidatePath(`/admin/projetos/${cleanId}/editar`)
+    revalidatePath(`/admin/projetos/${cleanId}/preview`)
+    revalidatePath('/admin/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+
+    return { success: true, data: { id: cleanId } }
+  } catch (err) {
+    console.error('[unarchiveProject] inesperado:', err)
+    return { success: false, error: 'Erro interno ao desarquivar projeto.' }
+  }
+}
+
+/**
+ * Atualiza os projetos em destaque da Home e suas respectivas ordens de exibição (display_order).
+ */
+export async function updateFeaturedProjects(
+  featuredIds: string[]
+): Promise<ActionResponse<{ count: number }>> {
+  try {
+    await requireAdminProfile()
+    const supabase = await createClient()
+
+    // 1. Zera featured na tabela projects e em project_publications
+    const filterCondition = featuredIds.length > 0 
+      ? `(${featuredIds.map(id => `"${id}"`).join(',')})`
+      : '("")'
+
+    await supabase
+      .from('projects')
+      .update({ featured: false })
+      .not('id', 'in', filterCondition)
+
+    await supabase
+      .from('project_publications')
+      .update({ featured: false })
+      .not('project_id', 'in', filterCondition)
+
+    // 2. Para cada ID da lista, atualiza featured = true e o display_order sequencial nas duas tabelas
+    for (let i = 0; i < featuredIds.length; i++) {
+      const pid = featuredIds[i]
+      if (!UUID_REGEX.test(pid)) continue
+      const order = i + 1
+      const now = new Date().toISOString()
+
+      // Atualiza o projeto de trabalho
+      await supabase
+        .from('projects')
+        .update({
+          featured: true,
+          display_order: order,
+          updated_at: now,
+        })
+        .eq('id', pid)
+
+      // Atualiza a publicação ativa (se já estiver publicado)
+      await supabase
+        .from('project_publications')
+        .update({
+          featured: true,
+          display_order: order,
+          updated_at: now,
+        })
+        .eq('project_id', pid)
+    }
+
+    // 3. Revalida a Home e as páginas de administração
+    revalidatePath('/')
+    revalidatePath('/projetos')
+    revalidatePath('/admin')
+    revalidatePath('/admin/dashboard')
+    revalidatePath('/admin/destaques')
+    revalidatePath('/admin/projetos')
+
+    return { success: true, data: { count: featuredIds.length } }
+  } catch (err) {
+    console.error('[updateFeaturedProjects] Erro inesperado:', err)
+    return { success: false, error: 'Erro ao atualizar destaques da Home.' }
+  }
+}
+

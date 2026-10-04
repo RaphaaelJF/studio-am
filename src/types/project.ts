@@ -37,6 +37,8 @@ export interface DbProject {
   featured: boolean;
   display_order: number;
   published_at: string | null;
+  deleted_at?: string | null;
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 }

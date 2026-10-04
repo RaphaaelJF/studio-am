@@ -206,7 +206,7 @@
   grid-template-areas:
     "brand header"
     "sidebar workspace"
-    "footer footer";
+    ". footer";
   gap: 14px;
   padding: 12px;
   overflow-x: hidden;
@@ -406,7 +406,7 @@
   }
 }
 
-/* Rodapé: acordeão mobile e grid desktop */
+/* Rodapé: acordeão mobile e flex centralizado no desktop */
 @media (min-width: 768px) {
   .admin-mobile-help-wrapper {
     display: none !important;
@@ -414,7 +414,8 @@
 
   .admin-workflow-footer,
   .admin-workflow-desktop {
-    display: grid !important;
+    display: flex !important;
+    justify-content: center !important;
   }
 }
 
@@ -633,18 +634,23 @@
 
 .admin-workflow-footer {
   grid-area: footer;
-  display: grid;
-  grid-template-columns: 1.45fr 1.85fr 1.08fr;
-  gap: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
 }
 
 .admin-workflow-footer>section {
-  min-height: 188px;
-  padding: 15px 18px;
+  width: 100%;
+  max-width: 1140px;
+  min-height: auto;
+  padding: 24px 36px 22px;
 }
 
 .admin-workflow-footer h2 {
-  margin-bottom: 14px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  letter-spacing: .1em;
 }
 
 .admin-workflow-steps {
@@ -652,6 +658,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  padding: 0 10px;
 }
 
 .admin-workflow-steps::before {
@@ -659,7 +666,7 @@
   position: absolute;
   inset: -20px;
   border-radius: 12px;
-  background: radial-gradient(80px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 255, 255, 0.04), transparent 100%);
+  background: radial-gradient(120px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 255, 255, 0.04), transparent 100%);
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
@@ -673,9 +680,9 @@
 .admin-workflow-steps>i {
   position: relative;
   z-index: 1;
-  margin-top: 19px;
+  margin-top: 24px;
   color: #d0d0ce;
-  font-size: 17px;
+  font-size: 20px;
   font-style: normal;
   opacity: 0.45;
   transition: opacity 0.2s ease, color 0.2s ease;
@@ -684,20 +691,20 @@
 .admin-workflow-step {
   position: relative;
   z-index: 1;
-  min-width: 48px;
+  min-width: 80px;
   text-align: center;
 }
 
 .admin-workflow-step>span {
-  width: 33px;
-  height: 33px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  margin: 0 auto 8px;
+  margin: 0 auto 10px;
   color: #f0f0ed;
-  border: 1px solid #c5c6c6;
+  border: 1.5px solid #c5c6c6;
   border-radius: 50%;
-  font-size: 19px;
+  font-size: 22px;
   line-height: 1;
   transform: translateZ(0);
   transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -705,10 +712,10 @@
 
 .admin-workflow-step small {
   color: #e4e4e1;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 12.5px;
+  line-height: 1.35;
   display: block;
-  opacity: 0.75;
+  opacity: 0.85;
   transition: opacity 0.2s ease, color 0.2s ease;
 }
 
@@ -812,11 +819,11 @@
 }
 
 .admin-draft-line {
-  margin-top: 12px;
+  margin-top: 18px;
   color: #c6c7c5;
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
-  letter-spacing: .02em;
+  letter-spacing: .03em;
 }
 
 .admin-permission-card {
@@ -1282,45 +1289,8 @@
   font-size: 10px;
 }
 
-/* Desktop adjustments (1280px and above) */
-@media (min-width: 1280px) {
-  .admin-workflow-footer {
-    grid-template-columns: 1.45fr 1.85fr 1.08fr;
-  }
-}
-
-/* Intermediate header adjustment between 1024px and 1279px */
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .admin-board-header {
-    grid-template-columns: minmax(200px, 1fr) minmax(380px, 1.8fr) minmax(160px, .8fr);
-    gap: 14px;
-  }
-
-  .admin-board-features {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .admin-board-feature:nth-child(n+3) {
-    display: none;
-  }
-}
-
-/* Tablet footer (768px - 1279px): 2 columns */
+/* Tablet adjustments (768px - 1279px) */
 @media (min-width: 768px) and (max-width: 1279px) {
-  .admin-workflow-footer {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .admin-tech-card {
-    grid-column: 1 / -1;
-    min-height: auto !important;
-  }
-
-  .admin-tech-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .appearance-presets {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1509,11 +1479,12 @@
 
   /* 6. Cards de Destaques */
   .admin-destaque-card {
-    display: grid !important;
-    grid-template-columns: 28px 64px minmax(0, 1fr) 44px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
-    min-height: 96px !important;
-    padding: 12px 14px !important;
+    justify-content: space-between !important;
+    min-height: auto !important;
+    padding: 14px !important;
     gap: 12px !important;
     width: 100% !important;
     box-sizing: border-box;
@@ -1615,7 +1586,8 @@
   }
 
   .admin-workflow-footer {
-    grid-template-columns: 1fr;
+    display: flex;
+    justify-content: center;
   }
 
   .admin-workflow-footer>section {

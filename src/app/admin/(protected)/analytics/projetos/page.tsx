@@ -1,16 +1,15 @@
 import React from 'react'
 import Link from 'next/link'
-import { AdminDemoBanner } from '../_components/AdminSharedUI'
-import { AppearancePanel } from '../_components/AppearancePanel'
-import { isDemoMode } from '../_fixtures/demo-projects'
-
+import { AdminDemoBanner } from '../../_components/AdminSharedUI'
+import { ProjectsPerformancePanel } from '../../_components/ProjectsPerformancePanel'
+import { isDemoMode } from '../../_fixtures/demo-projects'
 import { getSiteAnalyticsSummary } from '@/lib/admin/metrics'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
 }
 
-export default async function AdminAppearancePage({ searchParams }: PageProps) {
+export default async function AdminProjectsPerformancePage({ searchParams }: PageProps) {
   const params = await searchParams
   const isDemo = params.visual === 'demo' && isDemoMode()
 
@@ -34,7 +33,7 @@ export default async function AdminAppearancePage({ searchParams }: PageProps) {
     <>
       {isDemo && <AdminDemoBanner />}
       {backLink}
-      <AppearancePanel metrics={metrics} isDemo={isDemo} />
+      <ProjectsPerformancePanel metrics={metrics} isDemo={isDemo} />
     </>
   )
 }

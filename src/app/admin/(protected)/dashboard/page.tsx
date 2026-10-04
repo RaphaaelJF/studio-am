@@ -25,10 +25,11 @@ export default async function FullDashboardPage(props: {
     if (result.success) projects = result.data
   }
 
-  const publishedCount = isDemo ? 12 : projects.filter(p => p.status === 'published').length
-  const draftCount = isDemo ? 3 : projects.filter(p => p.status === 'draft').length
-  const featuredCount = isDemo ? 8 : projects.filter(p => p.featured).length
-  const recentProjects = [...projects]
+  const activeProjects = projects.filter(p => !p.deleted_at && !p.archived_at)
+  const publishedCount = isDemo ? 12 : activeProjects.filter(p => p.status === 'published').length
+  const draftCount = isDemo ? 3 : activeProjects.filter(p => p.status === 'draft').length
+  const featuredCount = isDemo ? 8 : activeProjects.filter(p => p.featured).length
+  const recentProjects = [...activeProjects]
     .sort((a, b) => a.display_order - b.display_order)
     .slice(0, 4)
 

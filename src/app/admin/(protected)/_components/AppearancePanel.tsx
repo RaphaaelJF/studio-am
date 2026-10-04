@@ -1,110 +1,178 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useToast } from './AdminToastContext'
-import { demoThumbnails } from '../_fixtures/demo-projects'
+import { AdminCard } from './AdminSharedUI'
+import type { AnalyticsSummary } from '@/lib/admin/metrics'
 
-type AppearanceTab = 'presets' | 'cores' | 'tipografia' | 'espacamentos'
-
-const tabs: Array<{ id: AppearanceTab; label: string }> = [
-  { id: 'presets', label: 'Presets de tema' },
-  { id: 'cores', label: 'Cores' },
-  { id: 'tipografia', label: 'Tipografia' },
-  { id: 'espacamentos', label: 'Espaçamentos' },
-]
-
-const presets = [
-  { id: 'mineral', name: 'Mineral', top: '#a99f8c', background: '#f7f5ef', text: '#1b1b19', accent: '#9d9580' },
-  { id: 'areia', name: 'Areia', top: '#ead3b5', background: '#fbf8f2', text: '#24201c', accent: '#c8a77f' },
-  { id: 'grafite', name: 'Grafite', top: '#292a2a', background: '#f2f2ef', text: '#111315', accent: '#626361' },
-  { id: 'oliva', name: 'Oliva', top: '#9b9b69', background: '#f6f5ee', text: '#25251f', accent: '#7c7d50' },
-  { id: 'noturno', name: 'Noturno', top: '#0c1822', background: '#f2f4f4', text: '#101820', accent: '#3f5868' },
-] as const
-
-export function AppearancePanel() {
-  const { toast } = useToast()
-  const [tab, setTab] = useState<AppearanceTab>('presets')
-  const [selected, setSelected] = useState(0)
-  const preset = presets[selected] ?? presets[0]
-
-  const save = () => toast('Aparência salva somente nesta sessão demonstrativa.', 'info')
-
-  return (
-    <div className="appearance-panel">
-      <div className="appearance-panel-header">
-        <div>
-          <h1>Aparência</h1>
-          <p>Personalize o visual do site de forma segura.</p>
-        </div>
-        <button type="button" onClick={save}>Salvar alterações</button>
-      </div>
-
-      <div className="appearance-panel-body">
-        <aside className="appearance-tabs admin-tabs-outer" aria-label="Opções de aparência">
-          <div className="admin-tabs-inner">
-            {tabs.map(item => (
-              <button key={item.id} type="button" onClick={() => setTab(item.id)} className={tab === item.id ? 'is-active whitespace-nowrap' : 'whitespace-nowrap'}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <section className="appearance-content">
-          {tab === 'presets' && (
-            <>
-              <h2>Presets de tema</h2>
-              <p className="appearance-help">Escolha uma variação de tema. A estrutura do site não será alterada.</p>
-              <div className="appearance-presets">
-                {presets.map((item, index) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    aria-pressed={selected === index}
-                    onClick={() => setSelected(index)}
-                    className={selected === index ? 'is-active' : ''}
-                  >
-                    <span className="appearance-preset-bar" style={{ background: item.top }} />
-                    <strong style={{ color: item.text }}>Aa</strong>
-                    <span className="appearance-swatches">
-                      <i style={{ background: item.text }} /><i style={{ background: item.accent }} /><i style={{ background: item.background }} />
-                    </span>
-                    <small>{item.name}</small>
-                    {selected === index && <em>Ativo</em>}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {tab === 'cores' && <SafeOption title="Cores permitidas" description="Ajuste apenas a paleta de superfícies, textos e destaque." />}
-          {tab === 'tipografia' && <SafeOption title="Tipografia" description="Escolha combinações aprovadas para títulos e textos." />}
-          {tab === 'espacamentos' && <SafeOption title="Espaçamentos" description="Use densidade compacta, equilibrada ou confortável sem mover seções." />}
-
-          <h2 className="appearance-preview-title">Prévia rápida</h2>
-          <div className="appearance-preview" style={{ background: preset.background, color: preset.text }}>
-            <div className="appearance-preview-nav">
-              <div><strong>Studio AM</strong><small>Arquitetura • Engenharia</small></div>
-              <nav><span>Projetos</span><span>Serviços</span><span>Processo</span><span>Sobre</span><span>Contato</span></nav>
-            </div>
-            <div className="appearance-preview-hero">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={demoThumbnails['demo-andreia-marco']} alt="Prévia da Casa Andreia e Marco" />
-              <div><span>Residencial • 2024</span><strong>Casa Andreia e Marco</strong></div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  )
+interface ColorToken {
+  name: string
+  token: string
+  hex: string
+  role: string
+  textColor?: string
+  borderColor?: string
 }
 
-function SafeOption({ title, description }: { title: string; description: string }) {
+const officialColors: ColorToken[] = [
+  {
+    name: 'Preto Profundo',
+    token: '--color-black',
+    hex: '#0B0B0B',
+    role: 'Títulos principais e tipografia de máximo contraste',
+    textColor: '#FFFFFF',
+  },
+  {
+    name: 'Grafite Arquitetônico',
+    token: '--color-graphite',
+    hex: '#2B2B2A',
+    role: 'Fundo da seção de contato e rodapés escuros',
+    textColor: '#FFFFFF',
+  },
+  {
+    name: 'Cinza Editorial',
+    token: '--color-gray',
+    hex: '#70706D',
+    role: 'Textos de apoio, legendas e elementos secundários',
+    textColor: '#FFFFFF',
+  },
+  {
+    name: 'Cinza Claro',
+    token: '--color-light-gray',
+    hex: '#D9D8D4',
+    role: 'Linhas divisórias e bordas estruturais',
+    textColor: '#1B1B19',
+    borderColor: '#C5C4BF',
+  },
+  {
+    name: 'Bege Mineral',
+    token: '--color-beige',
+    hex: '#F2EFE9',
+    role: 'Fundo principal das páginas e leitura quente',
+    textColor: '#1B1B19',
+    borderColor: '#E2DFD8',
+  },
+  {
+    name: 'Branco Quente',
+    token: '--color-warm-white',
+    hex: '#FBFAF7',
+    role: 'Superfícies elevadas e cartões editoriais',
+    textColor: '#1B1B19',
+    borderColor: '#EBE9E3',
+  },
+  {
+    name: 'Branco Puro',
+    token: '--color-white',
+    hex: '#FFFFFF',
+    role: 'Destaques pontuais e fundos neutros',
+    textColor: '#1B1B19',
+    borderColor: '#E5E5E5',
+  },
+]
+
+interface AppearancePanelProps {
+  metrics?: AnalyticsSummary | null
+  isDemo?: boolean
+}
+
+type PeriodFilter = '7d' | '30d' | 'total'
+
+export function AppearancePanel({ isDemo: _isDemo }: AppearancePanelProps) {
   return (
-    <div className="appearance-safe-option">
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <div><button type="button">Compacto</button><button type="button">Equilibrado</button><button type="button">Confortável</button></div>
+    <div className="space-y-10 max-w-5xl">
+      {/* Cabeçalho */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight" style={{ color: 'var(--admin-text)' }}>
+          Identidade Visual
+        </h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--admin-muted)' }}>
+          Guia de identidade visual oficial, paletas de cores e tipografia do Studio AM.
+        </p>
+      </div>
+
+      {/* BLOCO 1: IDENTIDADE VISUAL (Compacto e objetivo) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-900">
+              1. Identidade Visual — Paleta Mineral
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Cores oficiais aprovadas no V2.5. Não são permitidas cores externas ou saturações artificiais.
+            </p>
+          </div>
+          <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-gray-100 text-gray-600 border border-gray-200">
+            Design Congelado V2.5
+          </span>
+        </div>
+
+        <AdminCard className="p-3 sm:p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            {officialColors.map((c) => (
+              <div key={c.token} className="space-y-1.5">
+                <div
+                  className="w-full h-11 rounded flex items-end justify-between p-1.5 text-[10px] font-mono shadow-xs"
+                  style={{
+                    backgroundColor: c.hex,
+                    color: c.textColor,
+                    border: c.borderColor ? `1px solid ${c.borderColor}` : 'none',
+                  }}
+                >
+                  <span className="font-semibold">{c.hex}</span>
+                </div>
+                <div>
+                  <p className="font-medium text-xs text-gray-900 leading-tight">{c.name}</p>
+                  <p className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">{c.token}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </AdminCard>
+      </section>
+
+      {/* BLOCO 2: TIPOGRAFIA (Compacto e focado) */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-900">
+            2. Tipografia — Família Montserrat
+          </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            A família tipográfica oficial é a Montserrat. Sem fontes serifadas ou famílias paralelas.
+          </p>
+        </div>
+
+        <AdminCard className="p-4 divide-y divide-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-3">
+            <div>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1">
+                TÍTULO DISPLAY / H1 (Semibold)
+              </span>
+              <p className="text-lg sm:text-xl font-semibold text-gray-950 tracking-tight leading-snug">
+                Arquitetura que conecta. Engenharia que sustenta.
+              </p>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1">
+                TÍTULO DE CAPÍTULO / H2 (Medium)
+              </span>
+              <p className="text-base font-medium text-gray-900 tracking-tight leading-snug">
+                Projetos Selecionados & Casos de Estudo
+              </p>
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider block mb-1">
+                CORPO DE TEXTO / APOIO (Regular)
+              </span>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Projetos residenciais e comerciais funcionais, tecnicamente viáveis e pensados para a vida real.
+              </p>
+            </div>
+          </div>
+          <div className="pt-2.5 flex items-center justify-between text-[11px] font-mono text-gray-500">
+            <span>Escala: H1 (36–64px) • H2 (24–32px) • Body (14–16px)</span>
+            <span className="text-gray-400">WCAG AA Standard</span>
+          </div>
+        </AdminCard>
+      </section>
     </div>
   )
 }

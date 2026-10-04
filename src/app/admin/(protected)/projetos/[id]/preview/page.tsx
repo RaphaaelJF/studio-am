@@ -90,10 +90,34 @@ export default async function ProjectPreviewPage({ params, searchParams }: PageP
     display_order: project.display_order,
   }
 
+  // Carrega imagens de trabalho (project_images) para visualização fidedigna no preview do admin
+  const { data: imgRows } = await supabase
+    .from('project_images')
+    .select('id, storage_path, alt, caption, display_order, is_cover')
+    .eq('project_id', id)
+    .order('display_order', { ascending: true })
+
+  const previewImages = ((imgRows ?? []) as {
+    id: string; storage_path: string; alt: string; caption: string | null; display_order: number; is_cover: boolean
+  }[]).map((img) => {
+    const url = (img.storage_path.startsWith('http') || img.storage_path.startsWith('/'))
+      ? img.storage_path
+      : supabase.storage.from('project-images').getPublicUrl(img.storage_path.replace(/^project-images\//, '')).data.publicUrl
+    return {
+      kind: 'remote' as const,
+      id: img.id,
+      storageUrl: url,
+      alt: img.alt ?? '',
+      caption: img.caption ?? '',
+      is_cover: img.is_cover,
+      display_order: img.display_order,
+    }
+  })
+
   return (
     <ProjectPreview
       formData={formData}
-      images={[]}
+      images={previewImages}
       editUrl={editUrl}
       projectId={id}
       isDemo={isDemo}

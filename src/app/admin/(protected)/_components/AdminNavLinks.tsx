@@ -19,9 +19,11 @@ const navItems = [
   { label: 'Dashboard', description: 'Visão geral', href: '/admin', exact: true, icon: LayoutDashboardIcon },
   { label: 'Projetos', description: 'Criar, editar e publicar', href: '/admin/projetos', exact: false, icon: FolderIcon },
   { label: 'Destaques da Home', description: 'Selecionar projetos exibidos', href: '/admin/destaques', exact: false, icon: StarIcon },
-  { label: 'Páginas', description: 'Conteúdos institucionais', href: '/admin/paginas', exact: false, icon: FileTextIcon },
-  { label: 'Aparência (Segura)', description: 'Cores, fontes e presets', href: '/admin/aparencia', exact: false, icon: PaletteIcon },
+  { label: 'Identidade Visual', description: 'Cores, fontes e diretrizes', href: '/admin/aparencia', exact: false, icon: PaletteIcon },
   { label: 'Mídia', description: 'Biblioteca de imagens', href: '/admin/midia', exact: false, icon: ImageIcon },
+  { label: 'Métricas do Site', description: 'Visitas e acessos', href: '/admin/analytics', exact: true, icon: FileTextIcon },
+  { label: 'Desempenho dos Projetos', description: 'Ranking e conversões', href: '/admin/analytics/projetos', exact: false, icon: StarIcon },
+  { label: 'Páginas', description: 'Conteúdos institucionais', href: '/admin/paginas', exact: false, icon: FileTextIcon },
   { label: 'Usuários', description: 'Acesso e permissões', href: '/admin/usuarios', exact: false, icon: UsersIcon },
   { label: 'Configurações', description: 'Geral e integrações', href: '/admin/configuracoes', exact: false, icon: SettingsIcon },
 ]

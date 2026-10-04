@@ -11,9 +11,9 @@ import { PlusIcon } from '@/components/shared/Icons'
 import { formatDate } from '@/types/admin-project-form'
 
 import { ProjectListClient } from './_components/ProjectListClient'
-import { ProjectDraftProvider } from './_components/ProjectDraftProvider'
-import { ProjectForm } from './_components/ProjectForm'
-import { AppearancePanel } from './_components/AppearancePanel'
+import { AdminAnalyticsPreview, AdminProjectsPreview } from './_components/DashboardPreviews'
+
+import { getSiteAnalyticsSummary } from '@/lib/admin/metrics'
 
 function OverviewFrame({ title, url, children }: { title: string; url: string; children: React.ReactNode }) {
   return (
@@ -44,6 +44,9 @@ export default async function AdminDashboardPage(props: {
     if (result.success) projects = result.data
   }
 
+  const metricsResult = isDemo ? null : await getSiteAnalyticsSummary()
+  const metrics = metricsResult?.success ? metricsResult.data : null
+
   const publishedCount = isDemo ? 12 : projects.filter(p => p.status === 'published').length
   const draftCount = isDemo ? 3 : projects.filter(p => p.status === 'draft').length
   const featuredCount = isDemo ? 8 : projects.filter(p => p.featured).length
@@ -58,8 +61,8 @@ export default async function AdminDashboardPage(props: {
   const projectsHref = isDemo ? '/admin/projetos?visual=demo' : '/admin/projetos'
   const dashUrl = isDemo ? '/admin/dashboard?visual=demo' : '/admin/dashboard'
   const projUrl = isDemo ? '/admin/projetos?visual=demo' : '/admin/projetos'
-  const editUrl = isDemo ? '/admin/projetos/demo-andreia-marco/editar?visual=demo' : '/admin/projetos/novo'
-  const appearanceUrl = isDemo ? '/admin/aparencia?visual=demo' : '/admin/aparencia'
+  const analyticsUrl = isDemo ? '/admin/analytics?visual=demo' : '/admin/analytics'
+  const projAnalyticsUrl = isDemo ? '/admin/analytics/projetos?visual=demo' : '/admin/analytics/projetos'
 
   const activity = [
     { text: 'Casa Andreia e Marco atualizada', time: '3 horas atrás' },
@@ -77,8 +80,6 @@ export default async function AdminDashboardPage(props: {
       time: formatDate(p.updated_at),
     }))
   const feed = isDemo ? activity : realActivity
-
-  const demoEdit = demoProjectsFull['demo-andreia-marco']
 
   return (
     <div className="flex flex-col space-y-4">
@@ -137,13 +138,30 @@ export default async function AdminDashboardPage(props: {
                 ) : (
                   <ul>
                     {recentProjects.map((p, i) => {
-                      const thumb = isDemo && (p.id in demoThumbnails) ? demoThumbnails[p.id as DemoId] : null
+                      const thumb = p.cover_url || (isDemo && (p.id in demoThumbnails) ? demoThumbnails[p.id as DemoId] : null)
                       const editHref = isDemo ? `/admin/projetos/${p.id}/editar?visual=demo` : `/admin/projetos/${p.id}/editar`
                       return (
                         <li key={p.id} style={{ borderBottom: i < recentProjects.length - 1 ? '1px solid var(--admin-border)' : 'none' }}>
                           <Link href={editHref} className="flex items-center gap-3 px-5 py-3 transition-colors" style={{ color: 'inherit' }}>
-                            <div className="shrink-0 rounded overflow-hidden" style={{ width: 56, height: 40, background: 'var(--admin-active)', border: '1px solid var(--admin-border)' }}>
-                              {thumb && <Image src={thumb} alt={p.title} width={56} height={40} className="w-full h-full object-cover" />}
+                            <div className="shrink-0 rounded overflow-hidden flex items-center justify-center relative" style={{ width: 56, height: 40, background: 'var(--admin-active)', border: '1px solid var(--admin-border)' }}>
+                              {thumb ? (
+                                <Image src={thumb} alt={p.title} width={56} height={40} className="w-full h-full object-cover" unoptimized />
+                              ) : (
+                                <svg
+                                  className="w-4 h-4 opacity-40"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  style={{ color: 'var(--admin-muted)' }}
+                                >
+                                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                  <circle cx="9" cy="9" r="2" />
+                                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                </svg>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate" style={{ color: 'var(--admin-text)' }}>{p.title}</p>
@@ -190,20 +208,14 @@ export default async function AdminDashboardPage(props: {
           <ProjectListClient projects={projects} isDemo={isDemo} />
         </OverviewFrame>
 
-        {/* QUADRO 3: EDITAR PROJETO */}
-        <OverviewFrame title="3. EDITAR PROJETO" url={editUrl}>
-          {isDemo && demoEdit ? (
-            <ProjectDraftProvider draftKey="demo-andreia-marco" initialFormData={demoEdit.formData} initialImages={demoEdit.images}>
-              <ProjectForm mode="edit" backUrl={projUrl} isDemo={isDemo} />
-            </ProjectDraftProvider>
-          ) : (
-             <div className="p-8 text-center text-sm">Crie ou selecione um projeto para editar.</div>
-          )}
+        {/* QUADRO 3: MÉTRICAS DO SITE */}
+        <OverviewFrame title="3. MÉTRICAS DO SITE" url={analyticsUrl}>
+          <AdminAnalyticsPreview metrics={metrics} />
         </OverviewFrame>
 
-        {/* QUADRO 4: APARÊNCIA */}
-        <OverviewFrame title="4. APARÊNCIA (OPÇÕES PERMITIDAS)" url={appearanceUrl}>
-          <AppearancePanel />
+        {/* QUADRO 4: DESEMPENHO DOS PROJETOS */}
+        <OverviewFrame title="4. DESEMPENHO DOS PROJETOS" url={projAnalyticsUrl}>
+          <AdminProjectsPreview metrics={metrics} />
         </OverviewFrame>
 
       </div>

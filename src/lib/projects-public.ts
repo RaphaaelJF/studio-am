@@ -12,6 +12,7 @@ export interface PublicProjectImage {
 }
 
 export interface PublicProject {
+  id?: string
   slug: string
   title: string
   category: string
@@ -51,6 +52,7 @@ type DbImageRow = {
 }
 
 type DbProjectRow = {
+  project_id?: string
   slug: string
   title: string
   category: string
@@ -59,7 +61,9 @@ type DbProjectRow = {
   location: string | null
   year: number | null
   area: string | null
-  project_images: DbImageRow[]
+  featured?: boolean
+  display_order: number
+  project_publication_images: DbImageRow[]
 }
 
 /** URL pública a partir do storage_path. Aceita URL http, caminho local (/images/...) ou path do Storage. */
@@ -75,13 +79,14 @@ function rowToPublic(
   supabase: Parameters<typeof publicUrl>[0],
   row: DbProjectRow,
 ): PublicProject | null {
-  const images = [...(row.project_images ?? [])].sort((a, b) => a.display_order - b.display_order)
+  const images = [...(row.project_publication_images ?? [])].sort((a, b) => a.display_order - b.display_order)
   if (images.length === 0) return null
   const coverRow = images.find((i) => i.is_cover) ?? images[0]
   // Galeria filtrada: remove a imagem definida como capa para evitar repetição visual
   const galleryImages = images.filter((i) => i !== coverRow && !i.is_cover)
 
   return {
+    id: row.project_id,
     slug: row.slug,
     title: row.title,
     category: row.category,
@@ -102,18 +107,24 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 /**
  * Lista projetos publicados do Supabase.
- * Em produção: consulta estritamente o Supabase; se não houver projetos publicados, retorna [].
- * Em desenvolvimento: permite fallback para o mock local se o Supabase não estiver configurado/acessível.
+ * - featuredOnly: se verdadeiro, busca prioritariamente os marcados como destaque na Home (featured = true).
+ * - Em produção: consulta estritamente o Supabase (project_publications); se não houver projetos publicados, retorna [].
+ * - Em desenvolvimento: permite fallback para o mock local se o Supabase não estiver configurado/acessível.
  */
-export async function getPublishedProjects(): Promise<PublicProject[]> {
+export async function getPublishedProjects(options?: { featuredOnly?: boolean }): Promise<PublicProject[]> {
   try {
     const supabase = getPublicSupabase()
-    const { data, error } = await supabase
-      .from('projects')
+    let query = supabase
+      .from('project_publications')
       .select(
-        'slug, title, category, summary, description, location, year, area, project_images(storage_path, alt, caption, display_order, is_cover)',
+        'project_id, slug, title, category, summary, description, location, year, area, featured, display_order, project_publication_images(storage_path, alt, caption, display_order, is_cover)',
       )
-      .eq('status', 'published')
+
+    if (options?.featuredOnly) {
+      query = query.eq('featured', true)
+    }
+
+    const { data, error } = await query
       .order('display_order', { ascending: true })
       .order('updated_at', { ascending: false })
 
@@ -124,6 +135,12 @@ export async function getPublishedProjects(): Promise<PublicProject[]> {
       .filter((p): p is PublicProject => p !== null)
 
     if (mapped.length > 0) return mapped
+
+    // Se filtrou por destaque e não encontrou nenhum marcado como featured, faz fallback para os primeiros publicados
+    if (options?.featuredOnly) {
+      const fallbackAll = await getPublishedProjects({ featuredOnly: false })
+      if (fallbackAll.length > 0) return fallbackAll
+    }
 
     // Em produção, se o banco retornou 0 projetos publicados, retorna lista vazia
     if (!isDev) {
@@ -142,18 +159,17 @@ export async function getPublishedProjects(): Promise<PublicProject[]> {
 
 /**
  * Busca projeto publicado por slug no Supabase.
- * Em produção: se não encontrar no banco com status=published, retorna null (404).
+ * Em produção: se não encontrar no banco na tabela project_publications, retorna null (404).
  * Em desenvolvimento: permite fallback para o mock local se o banco não possuir o slug.
  */
 export async function getPublishedProjectBySlug(slug: string): Promise<PublicProject | null> {
   try {
     const supabase = getPublicSupabase()
     const { data, error } = await supabase
-      .from('projects')
+      .from('project_publications')
       .select(
-        'slug, title, category, summary, description, location, year, area, project_images(storage_path, alt, caption, display_order, is_cover)',
+        'project_id, slug, title, category, summary, description, location, year, area, project_publication_images(storage_path, alt, caption, display_order, is_cover)',
       )
-      .eq('status', 'published')
       .eq('slug', slug)
       .maybeSingle()
 
@@ -178,3 +194,4 @@ export async function getPublishedProjectBySlug(slug: string): Promise<PublicPro
   const mock = portfolioProjects.find((p) => p.slug === slug)
   return mock ? mockToPublic(mock) : null
 }
+

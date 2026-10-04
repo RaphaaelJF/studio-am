@@ -5,8 +5,22 @@ import { MoveRightIcon, ArrowUpRightIcon } from '@/components/shared/Icons';
 import { getPublishedProjects } from '@/lib/projects-public';
 
 export async function SelectedProjectsSection() {
-  const projects = await getPublishedProjects();
-  const [project1, project2, project3] = projects;
+  // 1. Busca os projetos marcados como destaque pelo admin
+  const featuredList = await getPublishedProjects({ featuredOnly: true });
+  
+  // 2. Se houver menos de 3 destaques, preenche com os outros publicados para fechar o trio harmonioso
+  const displayProjects = [...featuredList];
+  if (displayProjects.length < 3) {
+    const allPublished = await getPublishedProjects({ featuredOnly: false });
+    for (const p of allPublished) {
+      if (!displayProjects.some((d) => d.slug === p.slug)) {
+        displayProjects.push(p);
+      }
+      if (displayProjects.length >= 3) break;
+    }
+  }
+
+  const [project1, project2, project3] = displayProjects;
 
   return (
     <section id="projetos" className="scroll-mt-24 md:scroll-mt-28 pt-16 md:pt-24 pb-16 md:pb-20 px-6 md:px-12 bg-warm-white border-t border-light-gray">
@@ -19,19 +33,19 @@ export async function SelectedProjectsSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-y-12 md:gap-x-12 lg:gap-x-16">
-          {/* Projeto 1 */}
+          {/* Projeto 1 (Capa Principal) */}
           {project1 && (
             <Link
               href={`/projetos/${project1.slug}`}
               className="col-span-1 md:col-span-12 group block"
             >
-              <div className="relative aspect-[16/9] overflow-hidden mb-6 bg-light-gray">
+              <div className="relative aspect-[16/9] overflow-hidden mb-6">
                 <Image
                   src={project1.cover.src}
                   alt={project1.cover.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1400px) 100vw, 1400px"
-                  className="object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                 />
               </div>
               <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -54,13 +68,13 @@ export async function SelectedProjectsSection() {
               href={`/projetos/${project2.slug}`}
               className="col-span-1 md:col-span-5 md:mt-12 group block"
             >
-              <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-light-gray">
+              <div className="relative aspect-[16/10] overflow-hidden mb-6">
                 <Image
                   src={project2.cover.src}
                   alt={project2.cover.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
-                  className="object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                 />
               </div>
               <div className="flex justify-between items-start">
@@ -81,13 +95,13 @@ export async function SelectedProjectsSection() {
               href={`/projetos/${project3.slug}`}
               className="col-span-1 md:col-span-7 group block"
             >
-              <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-light-gray">
+              <div className="relative aspect-[16/10] overflow-hidden mb-6">
                 <Image
                   src={project3.cover.src}
                   alt={project3.cover.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 800px"
-                  className="object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                 />
               </div>
               <div className="flex justify-between items-start">

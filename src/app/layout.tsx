@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,6 +48,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${montserrat.variable} ${cormorant.variable}`}>
       <body className="min-h-screen flex flex-col antialiased">
+        <AnalyticsTracker />
         {children}
       </body>
     </html>
