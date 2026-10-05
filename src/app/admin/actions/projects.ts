@@ -61,6 +61,10 @@ function sanitizeFileName(name: string): string {
     .slice(-120)
 }
 
+function isPreviewTestMode(): boolean {
+  return process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true'
+}
+
 function sanitizeAndValidateDraft(raw: ProjectFormData): {
   valid: boolean
   errors: Record<string, string>
@@ -140,6 +144,13 @@ export async function createProjectDraft(
   try {
     await requireAdminProfile()
 
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — salvamento no banco requer autenticação real.',
+      }
+    }
+
     const validation = sanitizeAndValidateDraft(formData)
     if (!validation.valid || !validation.payload) {
       return {
@@ -203,6 +214,13 @@ export async function updateProjectDraft(
 ): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — salvamento no banco requer autenticação real.',
+      }
+    }
 
     if (!projectId || typeof projectId !== 'string' || !UUID_REGEX.test(projectId.trim())) {
       return {
@@ -315,6 +333,13 @@ export async function registerUploadedProjectImages(
 ): Promise<ActionResponse<{ registered: number }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — registro de imagens requer autenticação real.',
+      }
+    }
 
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
@@ -593,6 +618,14 @@ export async function uploadProjectImages(
 export async function deleteProjectImage(imageId: string): Promise<ActionResponse<null>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — exclusão de imagens requer autenticação real.',
+      }
+    }
+
     if (!imageId || !UUID_REGEX.test(imageId.trim())) {
       return { success: false, error: 'Identificador de imagem inválido.' }
     }
@@ -707,6 +740,14 @@ export async function setProjectCoverImage(
 ): Promise<ActionResponse<null>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — definição de capa requer autenticação real.',
+      }
+    }
+
     if (!UUID_REGEX.test(projectId.trim()) || !UUID_REGEX.test(imageId.trim())) {
       return { success: false, error: 'Identificadores inválidos.' }
     }
@@ -743,6 +784,14 @@ export async function publishProject(
 ): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — publicação real requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -802,6 +851,14 @@ export async function publishProject(
 export async function unpublishProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — despublicação requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -847,6 +904,14 @@ export async function unpublishProject(projectId: string): Promise<ActionRespons
 export async function softDeleteProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — exclusão de projetos requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -892,6 +957,14 @@ export async function softDeleteProject(projectId: string): Promise<ActionRespon
 export async function restoreProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — restauração de projetos requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -925,6 +998,14 @@ export async function restoreProject(projectId: string): Promise<ActionResponse<
 export async function archiveProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — arquivamento de projetos requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -970,6 +1051,14 @@ export async function archiveProject(projectId: string): Promise<ActionResponse<
 export async function unarchiveProject(projectId: string): Promise<ActionResponse<{ id: string }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — desarquivamento de projetos requer autenticação no Supabase.',
+      }
+    }
+
     if (!projectId || !UUID_REGEX.test(projectId.trim())) {
       return { success: false, error: 'Identificador de projeto inválido.' }
     }
@@ -1008,6 +1097,14 @@ export async function updateFeaturedProjects(
 ): Promise<ActionResponse<{ count: number }>> {
   try {
     await requireAdminProfile()
+
+    if (isPreviewTestMode()) {
+      return {
+        success: false,
+        error: 'Indisponível no modo demonstração — salvamento de destaques requer autenticação no Supabase.',
+      }
+    }
+
     const supabase = await createClient()
 
     // 1. Zera featured na tabela projects e em project_publications

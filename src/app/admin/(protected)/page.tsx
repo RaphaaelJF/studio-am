@@ -41,7 +41,11 @@ export default async function AdminDashboardPage(props: {
     projects = demoProjects
   } else {
     const result = await getAdminProjects()
-    if (result.success) projects = result.data
+    if (result.success) {
+      projects = result.data
+    } else if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
+      projects = demoProjects
+    }
   }
 
   const metricsResult = isDemo ? null : await getSiteAnalyticsSummary()

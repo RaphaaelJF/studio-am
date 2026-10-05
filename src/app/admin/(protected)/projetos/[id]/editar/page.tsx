@@ -19,7 +19,9 @@ interface PageProps {
 export default async function EditProjectPage({ params, searchParams }: PageProps) {
   const { id } = await params
   const { visual } = await searchParams
-  const isDemo = visual === 'demo' && isDemoMode()
+  const isDemo =
+    (visual === 'demo' && isDemoMode()) ||
+    (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true')
 
   const backUrl = isDemo ? '/admin/projetos?visual=demo' : '/admin/projetos'
   const dashUrl = isDemo ? '/admin?visual=demo' : '/admin'

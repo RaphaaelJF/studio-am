@@ -1,6 +1,7 @@
-import React from 'react'
-import { AdminDemoBanner, AdminSectionHeader, AdminCard, AdminPrimaryButton, AdminSecondaryButton } from '../_components/AdminSharedUI'
+import { AdminDemoBanner, AdminSectionHeader, AdminCard, AdminSecondaryButton } from '../_components/AdminSharedUI'
 import { isDemoMode } from '../_fixtures/demo-projects'
+
+import { AdminDemoNoticeButton } from '../_components/AdminDemoNoticeButton'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
@@ -16,7 +17,7 @@ export default async function AdminConfiguracoesPage({ searchParams }: PageProps
       <AdminSectionHeader 
         title="Configurações Gerais" 
         subtitle="Identidade, contato e integrações do site."
-        action={<AdminPrimaryButton>Salvar todas as configurações</AdminPrimaryButton>}
+        action={<AdminDemoNoticeButton label="Salvar todas as configurações" actionName="Salvar configurações" />}
       />
       
       <div className="grid md:grid-cols-2 gap-6 items-start">

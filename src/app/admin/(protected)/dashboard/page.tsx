@@ -22,7 +22,11 @@ export default async function FullDashboardPage(props: {
     projects = demoProjects
   } else {
     const result = await getAdminProjects()
-    if (result.success) projects = result.data
+    if (result.success) {
+      projects = result.data
+    } else if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
+      projects = demoProjects
+    }
   }
 
   const activeProjects = projects.filter(p => !p.deleted_at && !p.archived_at)

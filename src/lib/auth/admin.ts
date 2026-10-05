@@ -12,6 +12,23 @@ export type AdminProfile = {
 }
 
 export async function requireAdminProfile(): Promise<AdminProfile> {
+  const isTestMode =
+    process.env.VERCEL_ENV !== 'production' &&
+    process.env.ADMIN_TEST_MODE === 'true'
+
+  if (isTestMode) {
+    const cookieStore = await cookies()
+    const customName = cookieStore.get('admin_display_name')?.value?.trim()
+    if (customName) {
+      return {
+        id: '00000000-0000-0000-0000-000000000000',
+        display_name: customName,
+        role: 'editor',
+        active: true,
+      }
+    }
+  }
+
   const supabase = await createClient()
 
   const {
@@ -30,18 +47,6 @@ export async function requireAdminProfile(): Promise<AdminProfile> {
 
   if (error || !profile || profile.active !== true) {
     redirect('/admin/access-denied')
-  }
-
-  // Se o modo de teste estiver ativo (apenas fora de produção) e houver nome temporário definido
-  if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
-    const cookieStore = await cookies()
-    const customName = cookieStore.get('admin_display_name')?.value?.trim()
-    if (customName) {
-      return {
-        ...(profile as AdminProfile),
-        display_name: customName,
-      }
-    }
   }
 
   return profile as AdminProfile

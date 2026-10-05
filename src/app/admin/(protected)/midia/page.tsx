@@ -1,6 +1,7 @@
-import React from 'react'
-import { AdminDemoBanner, AdminSectionHeader, AdminCard, AdminPrimaryButton } from '../_components/AdminSharedUI'
+import { AdminDemoBanner, AdminSectionHeader, AdminCard } from '../_components/AdminSharedUI'
 import { DEMO_IDS, demoThumbnails, isDemoMode } from '../_fixtures/demo-projects'
+
+import { AdminDemoNoticeButton } from '../_components/AdminDemoNoticeButton'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
@@ -16,7 +17,7 @@ export default async function AdminMidiaPage({ searchParams }: PageProps) {
       <AdminSectionHeader 
         title="Biblioteca de Mídia" 
         subtitle="Gerencie imagens e arquivos usados em todo o site."
-        action={<AdminPrimaryButton>Upload de arquivo</AdminPrimaryButton>}
+        action={<AdminDemoNoticeButton label="Upload de arquivo" actionName="Upload de arquivo" />}
       />
       
       <AdminCard className="p-1 mb-4 flex items-center justify-between">

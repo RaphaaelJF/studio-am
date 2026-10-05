@@ -17,7 +17,8 @@ export function isDemoId(id: string): id is DemoId {
 }
 
 export function isDemoMode(): boolean {
-  return process.env.NODE_ENV === 'development'
+  if (process.env.VERCEL_ENV === 'production') return false
+  return process.env.ADMIN_TEST_MODE === 'true' || process.env.NODE_ENV === 'development'
 }
 
 // Imagens locais: o modo demonstrativo não depende de serviços externos.

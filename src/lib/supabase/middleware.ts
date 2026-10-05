@@ -32,16 +32,24 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const isTestMode =
+    process.env.VERCEL_ENV !== 'production' &&
+    process.env.ADMIN_TEST_MODE === 'true'
+
+  const hasTestSession = isTestMode && !!request.cookies.get('admin_display_name')?.value
+
   const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login')
   const isAdminPage = request.nextUrl.pathname.startsWith('/admin')
 
-  if (isAdminPage && !isLoginPage && !user) {
+  const isAuthenticated = !!user || hasTestSession
+
+  if (isAdminPage && !isLoginPage && !isAuthenticated) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
     return NextResponse.redirect(url)
   }
 
-  if (isLoginPage && user) {
+  if (isLoginPage && isAuthenticated) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin'
     return NextResponse.redirect(url)

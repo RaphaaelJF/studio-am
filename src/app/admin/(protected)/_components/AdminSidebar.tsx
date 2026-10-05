@@ -14,7 +14,7 @@ export function AdminSidebar({ profile }: AdminSidebarProps) {
   const searchParams = useSearchParams()
   const isDemo = searchParams.get('visual') === 'demo'
 
-  const displayName = isDemo ? 'Anne Martins' : (profile.display_name || 'Usuário')
+  const displayName = profile.display_name || (isDemo ? 'Anne Martins' : 'Usuário')
   const roleLabel = isDemo ? 'Editora' : (profile.role === 'owner' ? 'Owner' : 'Editor')
   const avatarInitials = isDemo
     ? 'AM'

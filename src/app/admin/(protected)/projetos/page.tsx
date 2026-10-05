@@ -32,6 +32,9 @@ export default async function AdminProjectsPage({ searchParams }: PageProps) {
   const result = await getAdminProjects()
 
   if (!result.success) {
+    if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
+      return <>{backLink}<ProjectListClient projects={demoProjects} isDemo={true} /></>
+    }
     return (
       <div className="space-y-6">
         <div>

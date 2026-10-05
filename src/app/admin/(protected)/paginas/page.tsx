@@ -1,6 +1,7 @@
-import React from 'react'
-import { AdminDemoBanner, AdminSectionHeader, AdminCard, AdminSecondaryButton } from '../_components/AdminSharedUI'
+import { AdminDemoBanner, AdminSectionHeader, AdminCard } from '../_components/AdminSharedUI'
 import { isDemoMode } from '../_fixtures/demo-projects'
+
+import { AdminDemoNoticeButton } from '../_components/AdminDemoNoticeButton'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
@@ -37,7 +38,7 @@ export default async function AdminPaginasPage({ searchParams }: PageProps) {
                    <p className="text-xs font-mono" style={{ color: 'var(--admin-muted)' }}>{pagina.path}</p>
                 </div>
                 <div className="flex justify-end">
-                    <AdminSecondaryButton>Editar conteúdo</AdminSecondaryButton>
+                    <AdminDemoNoticeButton label="Editar conteúdo" actionName={`Editar página ${pagina.title}`} variant="secondary" />
                 </div>
              </AdminCard>
          ))}

@@ -1,6 +1,7 @@
-import React from 'react'
-import { AdminDemoBanner, AdminSectionHeader, AdminCard, AdminPrimaryButton } from '../_components/AdminSharedUI'
+import { AdminDemoBanner, AdminSectionHeader, AdminCard } from '../_components/AdminSharedUI'
 import { isDemoMode } from '../_fixtures/demo-projects'
+
+import { AdminDemoNoticeButton } from '../_components/AdminDemoNoticeButton'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
@@ -22,7 +23,7 @@ export default async function AdminUsuariosPage({ searchParams }: PageProps) {
       <AdminSectionHeader 
         title="Usuários e Permissões" 
         subtitle="Controle de acesso à área administrativa."
-        action={<AdminPrimaryButton>Convidar usuário</AdminPrimaryButton>}
+        action={<AdminDemoNoticeButton label="Convidar usuário" actionName="Convidar usuário" />}
       />
       
       <AdminCard className="admin-users-table overflow-hidden">
