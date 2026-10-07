@@ -3,18 +3,22 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 
 export async function checkIsTestMode(): Promise<boolean> {
-  // Bloqueado estritamente em produção real (Vercel Production)
-  if (process.env.VERCEL_ENV === 'production') return false
-  return process.env.ADMIN_TEST_MODE === 'true'
+  // Acesso por nome (temporário). Alternar em src/lib/auth/mode.ts.
+  return isNameLoginEnabled()
 }
 
 export async function loginAction(formData: FormData) {
   const inTestMode = await checkIsTestMode()
 
   if (inTestMode) {
-    const displayName = (formData.get('name') as string)?.trim() || 'Usuário de Demonstração'
+    const displayName = ((formData.get('name') as string) ?? '').trim().slice(0, 60)
+
+    if (displayName.length < 2) {
+      return { error: 'Informe um nome válido.' }
+    }
 
     // Define cookie temporário seguro para navegação demonstrativa
     const cookieStore = await cookies()

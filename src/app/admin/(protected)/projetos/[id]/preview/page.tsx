@@ -6,6 +6,7 @@ import { AdminErrorState } from '../../../_components/AdminSharedUI'
 import {
   demoProjectsFull, isDemoId, isDemoMode,
 } from '../../../_fixtures/demo-projects'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 import type { ProjectFormData } from '@/types/admin-project-form'
 import type { DbProject } from '@/types/project'
 
@@ -19,7 +20,7 @@ export default async function ProjectPreviewPage({ params, searchParams }: PageP
   const { visual } = await searchParams
   const isDemo =
     (visual === 'demo' && isDemoMode()) ||
-    (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true')
+    isNameLoginEnabled()
 
   const editUrl = isDemo
     ? `/admin/projetos/${id}/editar?visual=demo`

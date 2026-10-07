@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getAdminProjects } from '@/lib/admin/projects'
 import { ProjectListClient } from '../_components/ProjectListClient'
 import { demoProjects, isDemoMode } from '../_fixtures/demo-projects'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 import { AdminErrorState } from '../_components/AdminSharedUI'
 
 interface PageProps {
@@ -32,7 +33,7 @@ export default async function AdminProjectsPage({ searchParams }: PageProps) {
   const result = await getAdminProjects()
 
   if (!result.success) {
-    if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
+    if (isNameLoginEnabled()) {
       return <>{backLink}<ProjectListClient projects={demoProjects} isDemo={true} /></>
     }
     return (

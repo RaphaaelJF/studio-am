@@ -1,4 +1,5 @@
 import type { AdminProjectListItem } from '@/lib/admin/projects'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 import type { ProjectFormData, AnyImageItem } from '@/types/admin-project-form'
 
 // Projetos demo disponíveis apenas em development
@@ -17,8 +18,7 @@ export function isDemoId(id: string): id is DemoId {
 }
 
 export function isDemoMode(): boolean {
-  if (process.env.VERCEL_ENV === 'production') return false
-  return process.env.ADMIN_TEST_MODE === 'true' || process.env.NODE_ENV === 'development'
+  return isNameLoginEnabled() || process.env.NODE_ENV === 'development'
 }
 
 // Imagens locais: o modo demonstrativo não depende de serviços externos.

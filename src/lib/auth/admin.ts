@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 
 export type AdminRole = 'owner' | 'editor'
 
@@ -12,9 +13,7 @@ export type AdminProfile = {
 }
 
 export async function requireAdminProfile(): Promise<AdminProfile> {
-  const isTestMode =
-    process.env.VERCEL_ENV !== 'production' &&
-    process.env.ADMIN_TEST_MODE === 'true'
+  const isTestMode = isNameLoginEnabled()
 
   if (isTestMode) {
     const cookieStore = await cookies()

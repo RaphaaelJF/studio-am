@@ -3,6 +3,7 @@ import { ProjectDraftProvider } from '../../_components/ProjectDraftProvider'
 import { ProjectForm } from '../../_components/ProjectForm'
 
 import { isDemoMode } from '../../_fixtures/demo-projects'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 
 interface PageProps {
   searchParams: Promise<{ visual?: string }>
@@ -12,7 +13,7 @@ export default async function NewProjectPage({ searchParams }: PageProps) {
   const params = await searchParams
   const isDemo =
     (params.visual === 'demo' && isDemoMode()) ||
-    (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true')
+    isNameLoginEnabled()
 
   const draftKey = 'rascunho-local'
   const backUrl = isDemo ? '/admin/projetos?visual=demo' : '/admin/projetos'

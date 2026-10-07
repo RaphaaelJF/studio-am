@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { requireAdminProfile } from '@/lib/auth/admin'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 import { getAdminProjects } from '@/lib/admin/projects'
 import { AdminDemoBanner, AdminCard } from './_components/AdminSharedUI'
 import { demoProjects, demoThumbnails, isDemoMode, demoProjectsFull } from './_fixtures/demo-projects'
@@ -43,7 +44,7 @@ export default async function AdminDashboardPage(props: {
     const result = await getAdminProjects()
     if (result.success) {
       projects = result.data
-    } else if (process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true') {
+    } else if (isNameLoginEnabled()) {
       projects = demoProjects
     }
   }

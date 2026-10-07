@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { requireAdminProfile } from '@/lib/auth/admin'
+import { isNameLoginEnabled } from '@/lib/auth/mode'
 import type { ProjectFormData } from '@/types/admin-project-form'
 
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -62,7 +63,7 @@ function sanitizeFileName(name: string): string {
 }
 
 function isPreviewTestMode(): boolean {
-  return process.env.VERCEL_ENV !== 'production' && process.env.ADMIN_TEST_MODE === 'true'
+  return isNameLoginEnabled()
 }
 
 function sanitizeAndValidateDraft(raw: ProjectFormData): {
